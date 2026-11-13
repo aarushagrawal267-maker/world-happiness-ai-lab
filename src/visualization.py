@@ -351,8 +351,8 @@ def radar(profile: pd.DataFrame, features: list[str], axis_labels: list[str], ti
     fig.update_layout(polar=dict(
         bgcolor="rgba(0,0,0,0)",
         radialaxis=dict(range=[0, 100], gridcolor=GRID, linecolor=AXIS, tickfont=dict(color=MUTED, size=10), ticksuffix="", angle=90, tickangle=90),
-        angularaxis=dict(gridcolor=GRID, linecolor=AXIS, tickfont=dict(color=TEXT, size=11)),
-        domain=dict(x=[0.08, 0.92], y=[0.06, 0.88]),
+        angularaxis=dict(gridcolor=GRID, linecolor=AXIS, tickfont=dict(color=TEXT, size=11), rotation=90, direction="clockwise"),
+        domain=dict(x=[0.16, 0.84], y=[0.08, 0.9]),
     ), margin=dict(l=40, r=40, t=60, b=60), legend=dict(orientation="h", y=-0.08, x=0.5, xanchor="center", yanchor="top"))
     return _finish(fig, title, height=540)
 

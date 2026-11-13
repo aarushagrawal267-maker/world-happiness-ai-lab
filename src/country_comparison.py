@@ -56,7 +56,7 @@ def percentile_profile(panel: pd.DataFrame, countries: list[str], year: int) -> 
 
 
 def radar_axis_labels() -> list[str]:
-    return [SHORT_LABELS[f] if f != "perceptions_of_corruption" else "Low perceived corruption" for f in COMPARE_FEATURES]
+    return [SHORT_LABELS[f] if f != "perceptions_of_corruption" else "Low corruption" for f in COMPARE_FEATURES]
 
 
 def trend_series(panel: pd.DataFrame, countries: list[str], feature: str = TARGET) -> pd.DataFrame:
