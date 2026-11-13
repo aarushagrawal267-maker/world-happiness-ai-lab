@@ -1,0 +1,129 @@
+import math
+
+import streamlit as st
+
+from src import ui
+from src import visualization as viz
+from src.config import TARGET
+from src.explainability import explain_instance
+from src.prediction import input_specs, mahalanobis_extrapolation, nearest_profiles, predict_one, validate_inputs
+
+ui.page_header(
+    "Happiness Prediction",
+    "Enter a country profile and the model estimates the national average life evaluation typical of historical country-years with similar indicators — "
+    "with a calibrated 90% prediction interval and an explanation.",
+    "Simulate · Predict",
+)
+res = ui.ensure_trained()
+reg = ui.registry()
+b = ui.bundle()
+panel = b.panel
+
+choices = ["production_best"] + sorted(k for k, v in reg.items() if k.startswith(("production_", "custom_")) and k != "production_best")
+c1, c2 = st.columns([1.2, 2])
+with c1:
+    mname = st.selectbox("Model", choices, format_func=lambda n: f"★ {reg[n]['model_name']} (best)" if n == "production_best" else f"{reg[n]['model_name']} · {n}")
+meta = reg[mname]
+pipe = ui.model(mname)
+feats = meta["features"]
+specs = input_specs(meta["feature_ranges"], feats)
+q = res["conformal"]["q_cv"] if mname == "production_best" else None
+with c2:
+    st.markdown(f"<div style='padding-top:28px'>{ui.tags([(meta['model_name'], 'blue'), ('features: ' + meta['feature_set'], ''), ('trained on ' + str(meta.get('trained_on_rows', '—')) + ' country-years', ''), ('90% interval' if q else 'no calibrated interval', 'green' if q else 'orange')])}</div>", unsafe_allow_html=True)
+
+# --------------------------------------------------- prefill
+with st.expander("Start from a real country profile (optional)", expanded=False):
+    cc1, cc2, cc3 = st.columns([2, 1, 1])
+    with cc1:
+        pc = st.selectbox("Country", sorted(panel["country"].unique()), index=sorted(panel["country"].unique()).index("Brazil") if "Brazil" in set(panel["country"]) else 0)
+    rows = panel[panel["country"] == pc].sort_values("year")
+    with cc2:
+        py = st.selectbox("Year", rows["year"].tolist()[::-1])
+    with cc3:
+        st.write("")
+        st.write("")
+        if st.button("Load values"):
+            r = rows[rows["year"] == py].iloc[0]
+            for f, s in specs.items():
+                if s.is_categorical:
+                    st.session_state[f"pred_{f}"] = r.get(f, s.categories[0])
+                else:
+                    v = r.get(f)
+                    st.session_state[f"pred_{f}"] = float(s.default if v is None or (isinstance(v, float) and math.isnan(v)) else v)
+            st.session_state["pred_loaded"] = f"{pc} {py}"
+            st.rerun()
+if st.session_state.get("pred_loaded"):
+    st.caption(f"Form pre-filled from {st.session_state['pred_loaded']} (missing indicators replaced by the training median).")
+
+# --------------------------------------------------- form
+with st.form("predict"):
+    st.markdown("**Country indicators**")
+    values = {}
+    cols = st.columns(3)
+    for i, (f, s) in enumerate(specs.items()):
+        with cols[i % 3]:
+            if s.is_categorical:
+                values[f] = st.selectbox(s.label, s.categories, key=f"pred_{f}")
+            else:
+                if f"pred_{f}" not in st.session_state:
+                    st.session_state[f"pred_{f}"] = round(s.default, 4)
+                values[f] = st.number_input(s.label, min_value=s.hard_min, max_value=s.hard_max, step=s.step, format="%.3f" if s.step < 0.1 else "%.1f",
+                                            key=f"pred_{f}", help=f"{s.help}\n\nObserved range: {s.train_min:.3g} – {s.train_max:.3g}")
+                if f == "log_gdp_per_capita":
+                    st.caption(f"≈ ${math.exp(values[f]):,.0f} per person (PPP, constant international $)")
+                else:
+                    st.caption(f"observed {s.train_min:.3g} – {s.train_max:.3g} · median {s.default:.3g}")
+    go_btn = st.form_submit_button("Estimate life evaluation", type="primary")
+
+if go_btn or st.session_state.get("pred_last"):
+    if go_btn:
+        st.session_state["pred_last"] = values
+    values = st.session_state["pred_last"]
+    errors, warns = validate_inputs(values, specs)
+    if errors:
+        for e in errors:
+            ui.callout(e, "danger")
+        st.stop()
+    out = predict_one(pipe, values, feats, q)
+    maha = mahalanobis_extrapolation(panel, values, feats)
+    c1, c2 = st.columns([1, 1.25], gap="large")
+    with c1:
+        ui.chart(viz.gauge(out["prediction"], out.get("lower"), out.get("upper"), "Estimated Life Ladder (0–10)"), key="gauge")
+        if q:
+            st.markdown(f"<div style='text-align:center;margin-top:-10px'><span class='tag blue'>90% prediction interval: {out['lower']:.2f} – {out['upper']:.2f}</span></div>", unsafe_allow_html=True)
+            st.caption(f"Split-conformal interval (±{q:.2f}) calibrated on countries unseen during training; empirical coverage {res['conformal']['empirical_oof_coverage_cv']:.0%}.")
+        else:
+            st.caption("Calibrated intervals are computed for the best production model only.")
+    with c2:
+        ui.stat_row([("Model", meta["model_name"]), ("Point estimate", f"{out['prediction']:.3f}"),
+                     ("Profile typicality", f"{maha['percentile']:.0f}th pct"), ("Global mean", f"{panel[TARGET].mean():.2f}")])
+        for w in warns:
+            ui.callout(w, "warn")
+        if maha["unusual"]:
+            ui.callout(f"This <b>combination</b> of values is more unusual than {maha['percentile']:.1f}% of observed country-years (Mahalanobis distance {maha['distance']:.1f}). "
+                       "Even if each value is plausible alone, the model has seen few profiles like it.", "warn")
+        elif not warns:
+            ui.callout("All inputs lie inside the training range and the profile resembles observed country-years.", "ok")
+        st.markdown("**Most similar observed country-years**")
+        nn = nearest_profiles(panel, values, feats, 6)
+        st.dataframe(ui.fmt_table(nn[["country", "year", "region", "life_ladder", "distance"]]), hide_index=True)
+
+    ui.section("Why this estimate?", "")
+    c1, c2 = st.columns([1.3, 1])
+    import pandas as pd
+
+    row = pd.DataFrame([{f: values[f] for f in feats}])
+    ex = explain_instance(pipe, panel[feats].dropna(), row)
+    with c1:
+        ui.chart(viz.waterfall(ex["contributions"], ex["base_value"], ex["prediction"], f"Contribution of each input · {ex['method']}"), key="pwf")
+    with c2:
+        if mname.startswith("production_"):
+            pi = ui.permutation_importance(f"eval_group_{meta['model_key']}", "group")
+            ui.chart(viz.importance_bars(pi, "importance_mean", "importance_std", title="Global feature importance (permutation)", xtitle="Δ RMSE"), key="ppi")
+    ui.section("Limitations", "")
+    ui.card("What this estimate is — and is not",
+            "It is the model's estimate of the <b>national average</b> Cantril-ladder answer that historical country-years with similar indicators reported. "
+            "It cannot tell how happy any individual is, does not account for culture, conflict, inequality or events not captured by the inputs, and reflects "
+            "associations — not the effect of changing any indicator. Typical error for unseen countries is about "
+            f"±{res['best_model']['test']['rmse']:.2f} ladder points (RMSE).")
+ui.footer()

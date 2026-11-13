@@ -1,0 +1,72 @@
+# ---------------------------------------------------------------------------
+# WORLD HAPPINESS AI LAB — runtime configuration
+# Every value here can be changed without editing Python code.
+# ---------------------------------------------------------------------------
+
+project:
+  name: "World Happiness AI Lab"
+  tagline: "Understanding and Predicting Global Happiness"
+  random_state: 42
+
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  reference_dir: "data/reference"
+  # Primary modelling dataset (annual country-year panel, WHR 2023 DataForTable2.1)
+  panel_glob: "whr_panel/*.csv"
+  # Official WHR "Data for Figure 2.1" files, one per edition
+  official_glob: "whr_official/*"
+  # Kaggle unsdsn/world-happiness editions (2015-2019)
+  kaggle_glob: "kaggle_unsdsn/*.csv"
+  uploads_dir: "data/raw/uploads"
+
+modeling:
+  target: "life_ladder"
+  # Feature sets that can be selected for experiments
+  feature_sets:
+    core:
+      - log_gdp_per_capita
+      - social_support
+      - healthy_life_expectancy
+      - freedom
+      - generosity
+      - perceptions_of_corruption
+    core_plus_affect:
+      - log_gdp_per_capita
+      - social_support
+      - healthy_life_expectancy
+      - freedom
+      - generosity
+      - perceptions_of_corruption
+      - positive_affect
+      - negative_affect
+    engineered:
+      - log_gdp_per_capita
+      - social_support
+      - healthy_life_expectancy
+      - freedom
+      - generosity
+      - perceptions_of_corruption
+      - year
+      - gdp_growth_1y
+      - region
+  default_feature_set: "core"
+  # Random split proportions (train / validation / test)
+  test_size: 0.15
+  validation_size: 0.15
+  # Time-aware split: train <= train_end, validate in (train_end, val_end], test > val_end
+  time_split:
+    train_end: 2016
+    val_end: 2018
+  cv_folds: 5
+  tuning_iterations: 20
+  conformal_coverage: 0.90
+
+clustering:
+  k_min: 2
+  k_max: 8
+  profile_years: [2020, 2021, 2022]   # country profile = mean over these panel years
+
+app:
+  theme_primary: "#7C9CFF"
+  cache_ttl_seconds: 3600

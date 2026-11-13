@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Trained models are machine/library-specific; the app retrains them automatically
+models/*.joblib
+models/registry.json
+
+# User uploads
+data/raw/uploads/*
+!data/raw/uploads/.gitkeep
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.part
