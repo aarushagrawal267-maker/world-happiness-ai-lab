@@ -6,9 +6,6 @@ venv/
 .pytest_cache/
 .ipynb_checkpoints/
 
-# Trained models are machine/library-specific; the app retrains them automatically
-models/*.joblib
-models/registry.json
 
 # User uploads
 data/raw/uploads/*

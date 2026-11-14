@@ -1,0 +1,1665 @@
+{
+  "production_linear": {
+    "kind": "production",
+    "model_key": "linear",
+    "model_name": "Linear Regression",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "params": {},
+    "trained_on_rows": 2199,
+    "group_val_metrics": {
+      "r2": 0.7459106472711976,
+      "mae": 0.4260775953444344,
+      "mse": 0.32696602898669747,
+      "rmse": 0.5718094341532828,
+      "max_error": 1.862718905769675,
+      "bias": 0.01378145010505482,
+      "n": 319,
+      "adj_r2": 0.7410243135648744
+    },
+    "group_test_metrics": {
+      "r2": 0.6744142976785967,
+      "mae": 0.4342547583508975,
+      "mse": 0.3283800099622874,
+      "rmse": 0.5730445095821854,
+      "max_error": 1.8074469641534145,
+      "bias": 0.0007978511851109358,
+      "n": 303,
+      "adj_r2": 0.6678145874964061
+    },
+    "feature_ranges": {
+      "log_gdp_per_capita": {
+        "min": 5.527,
+        "max": 11.664,
+        "p01": 6.90656,
+        "p99": 11.440819999999993,
+        "median": 9.499,
+        "mean": 9.389760440569068,
+        "std": 1.1534019906135593
+      },
+      "social_support": {
+        "min": 0.228,
+        "max": 0.987,
+        "p01": 0.45355,
+        "p99": 0.97,
+        "median": 0.836,
+        "mean": 0.8106811527904848,
+        "std": 0.12095272969561909
+      },
+      "healthy_life_expectancy": {
+        "min": 28.0,
+        "max": 74.475,
+        "p01": 45.486,
+        "p99": 73.1,
+        "median": 65.06,
+        "mean": 63.342416705552964,
+        "std": 6.722210788054021
+      },
+      "freedom": {
+        "min": 0.258,
+        "max": 0.985,
+        "p01": 0.373,
+        "p99": 0.96,
+        "median": 0.77,
+        "mean": 0.7478471837488458,
+        "std": 0.14013744559250424
+      },
+      "generosity": {
+        "min": -0.338,
+        "max": 0.703,
+        "p01": -0.28099999999999997,
+        "p99": 0.46625,
+        "median": -0.023,
+        "mean": 9.125117591721416e-05,
+        "std": 0.16107902378832115
+      },
+      "perceptions_of_corruption": {
+        "min": 0.035,
+        "max": 0.983,
+        "p01": 0.164,
+        "p99": 0.965,
+        "median": 0.8,
+        "mean": 0.7452083533365339,
+        "std": 0.18583484757655158
+      }
+    },
+    "file": "production_linear.joblib",
+    "saved_at": "2026-11-14T06:35:01.643748+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 1.5
+  },
+  "production_ridge": {
+    "kind": "production",
+    "model_key": "ridge",
+    "model_name": "Ridge Regression",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "params": {
+      "alpha": 24.658329458549105
+    },
+    "trained_on_rows": 2199,
+    "group_val_metrics": {
+      "r2": 0.7450961299508752,
+      "mae": 0.4270784432612262,
+      "mse": 0.32801416221584145,
+      "rmse": 0.5727252065483424,
+      "max_error": 1.8556286526265406,
+      "bias": 0.011159879309979439,
+      "n": 319,
+      "adj_r2": 0.7401941324499304
+    },
+    "group_test_metrics": {
+      "r2": 0.6764534850426716,
+      "mae": 0.4341176710109224,
+      "mse": 0.32632332147088416,
+      "rmse": 0.571247163205984,
+      "max_error": 1.7870697289920772,
+      "bias": -0.0002935340950150021,
+      "n": 303,
+      "adj_r2": 0.6698951097394825
+    },
+    "feature_ranges": {
+      "log_gdp_per_capita": {
+        "min": 5.527,
+        "max": 11.664,
+        "p01": 6.90656,
+        "p99": 11.440819999999993,
+        "median": 9.499,
+        "mean": 9.389760440569068,
+        "std": 1.1534019906135593
+      },
+      "social_support": {
+        "min": 0.228,
+        "max": 0.987,
+        "p01": 0.45355,
+        "p99": 0.97,
+        "median": 0.836,
+        "mean": 0.8106811527904848,
+        "std": 0.12095272969561909
+      },
+      "healthy_life_expectancy": {
+        "min": 28.0,
+        "max": 74.475,
+        "p01": 45.486,
+        "p99": 73.1,
+        "median": 65.06,
+        "mean": 63.342416705552964,
+        "std": 6.722210788054021
+      },
+      "freedom": {
+        "min": 0.258,
+        "max": 0.985,
+        "p01": 0.373,
+        "p99": 0.96,
+        "median": 0.77,
+        "mean": 0.7478471837488458,
+        "std": 0.14013744559250424
+      },
+      "generosity": {
+        "min": -0.338,
+        "max": 0.703,
+        "p01": -0.28099999999999997,
+        "p99": 0.46625,
+        "median": -0.023,
+        "mean": 9.125117591721416e-05,
+        "std": 0.16107902378832115
+      },
+      "perceptions_of_corruption": {
+        "min": 0.035,
+        "max": 0.983,
+        "p01": 0.164,
+        "p99": 0.965,
+        "median": 0.8,
+        "mean": 0.7452083533365339,
+        "std": 0.18583484757655158
+      }
+    },
+    "file": "production_ridge.joblib",
+    "saved_at": "2026-11-14T06:35:01.651918+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 1.5
+  },
+  "production_lasso": {
+    "kind": "production",
+    "model_key": "lasso",
+    "model_name": "Lasso Regression",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "params": {
+      "alpha": 0.00012087541473056971,
+      "max_iter": 20000
+    },
+    "trained_on_rows": 2199,
+    "group_val_metrics": {
+      "r2": 0.745942853183352,
+      "mae": 0.42605493185857296,
+      "mse": 0.32692458593096174,
+      "rmse": 0.571773194484458,
+      "max_error": 1.8625543618096687,
+      "bias": 0.013709729699457348,
+      "n": 319,
+      "adj_r2": 0.7410571388214933
+    },
+    "group_test_metrics": {
+      "r2": 0.6743893219565938,
+      "mae": 0.43427888171052015,
+      "mse": 0.3284052000359966,
+      "rmse": 0.573066488320506,
+      "max_error": 1.8076549454149564,
+      "bias": 0.0007972083183176877,
+      "n": 303,
+      "adj_r2": 0.667789105509768
+    },
+    "feature_ranges": {
+      "log_gdp_per_capita": {
+        "min": 5.527,
+        "max": 11.664,
+        "p01": 6.90656,
+        "p99": 11.440819999999993,
+        "median": 9.499,
+        "mean": 9.389760440569068,
+        "std": 1.1534019906135593
+      },
+      "social_support": {
+        "min": 0.228,
+        "max": 0.987,
+        "p01": 0.45355,
+        "p99": 0.97,
+        "median": 0.836,
+        "mean": 0.8106811527904848,
+        "std": 0.12095272969561909
+      },
+      "healthy_life_expectancy": {
+        "min": 28.0,
+        "max": 74.475,
+        "p01": 45.486,
+        "p99": 73.1,
+        "median": 65.06,
+        "mean": 63.342416705552964,
+        "std": 6.722210788054021
+      },
+      "freedom": {
+        "min": 0.258,
+        "max": 0.985,
+        "p01": 0.373,
+        "p99": 0.96,
+        "median": 0.77,
+        "mean": 0.7478471837488458,
+        "std": 0.14013744559250424
+      },
+      "generosity": {
+        "min": -0.338,
+        "max": 0.703,
+        "p01": -0.28099999999999997,
+        "p99": 0.46625,
+        "median": -0.023,
+        "mean": 9.125117591721416e-05,
+        "std": 0.16107902378832115
+      },
+      "perceptions_of_corruption": {
+        "min": 0.035,
+        "max": 0.983,
+        "p01": 0.164,
+        "p99": 0.965,
+        "median": 0.8,
+        "mean": 0.7452083533365339,
+        "std": 0.18583484757655158
+      }
+    },
+    "file": "production_lasso.joblib",
+    "saved_at": "2026-11-14T06:35:01.660632+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 1.5
+  },
+  "production_decision_tree": {
+    "kind": "production",
+    "model_key": "decision_tree",
+    "model_name": "Decision Tree",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "params": {
+      "max_depth": 6,
+      "min_samples_leaf": 23,
+      "random_state": 42,
+      "min_samples_split": 21
+    },
+    "trained_on_rows": 2199,
+    "group_val_metrics": {
+      "r2": 0.7041962740960306,
+      "mae": 0.49310631616807904,
+      "mse": 0.38064471643375136,
+      "rmse": 0.6169641127600141,
+      "max_error": 1.9469230769230759,
+      "bias": 0.0006224618836539493,
+      "n": 319,
+      "adj_r2": 0.6985077409055697
+    },
+    "group_test_metrics": {
+      "r2": 0.5985844896834273,
+      "mae": 0.4830908587662831,
+      "mse": 0.40486061991336875,
+      "rmse": 0.6362865863063347,
+      "max_error": 2.044880952380953,
+      "bias": 0.013761536947190274,
+      "n": 303,
+      "adj_r2": 0.5904476887986319
+    },
+    "feature_ranges": {
+      "log_gdp_per_capita": {
+        "min": 5.527,
+        "max": 11.664,
+        "p01": 6.90656,
+        "p99": 11.440819999999993,
+        "median": 9.499,
+        "mean": 9.389760440569068,
+        "std": 1.1534019906135593
+      },
+      "social_support": {
+        "min": 0.228,
+        "max": 0.987,
+        "p01": 0.45355,
+        "p99": 0.97,
+        "median": 0.836,
+        "mean": 0.8106811527904848,
+        "std": 0.12095272969561909
+      },
+      "healthy_life_expectancy": {
+        "min": 28.0,
+        "max": 74.475,
+        "p01": 45.486,
+        "p99": 73.1,
+        "median": 65.06,
+        "mean": 63.342416705552964,
+        "std": 6.722210788054021
+      },
+      "freedom": {
+        "min": 0.258,
+        "max": 0.985,
+        "p01": 0.373,
+        "p99": 0.96,
+        "median": 0.77,
+        "mean": 0.7478471837488458,
+        "std": 0.14013744559250424
+      },
+      "generosity": {
+        "min": -0.338,
+        "max": 0.703,
+        "p01": -0.28099999999999997,
+        "p99": 0.46625,
+        "median": -0.023,
+        "mean": 9.125117591721416e-05,
+        "std": 0.16107902378832115
+      },
+      "perceptions_of_corruption": {
+        "min": 0.035,
+        "max": 0.983,
+        "p01": 0.164,
+        "p99": 0.965,
+        "median": 0.8,
+        "mean": 0.7452083533365339,
+        "std": 0.18583484757655158
+      }
+    },
+    "file": "production_decision_tree.joblib",
+    "saved_at": "2026-11-14T06:35:01.671951+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 4.1
+  },
+  "production_random_forest": {
+    "kind": "production",
+    "model_key": "random_forest",
+    "model_name": "Random Forest",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "params": {
+      "n_estimators": 400,
+      "max_depth": 6,
+      "min_samples_leaf": 4,
+      "max_features": 0.4,
+      "random_state": 42,
+      "min_samples_split": 20
+    },
+    "trained_on_rows": 2199,
+    "group_val_metrics": {
+      "r2": 0.7926763226693379,
+      "mae": 0.41375051664123336,
+      "mse": 0.26678724930311454,
+      "rmse": 0.5165145199344492,
+      "max_error": 1.5854408854293833,
+      "bias": 4.54539009831725e-05,
+      "n": 319,
+      "adj_r2": 0.7886893288745174
+    },
+    "group_test_metrics": {
+      "r2": 0.7310566350885881,
+      "mae": 0.39465886948623424,
+      "mse": 0.2712515451975205,
+      "rmse": 0.5208181498349692,
+      "max_error": 1.7398967923368103,
+      "bias": -0.03657017168303188,
+      "n": 303,
+      "adj_r2": 0.7256050803944378
+    },
+    "feature_ranges": {
+      "log_gdp_per_capita": {
+        "min": 5.527,
+        "max": 11.664,
+        "p01": 6.90656,
+        "p99": 11.440819999999993,
+        "median": 9.499,
+        "mean": 9.389760440569068,
+        "std": 1.1534019906135593
+      },
+      "social_support": {
+        "min": 0.228,
+        "max": 0.987,
+        "p01": 0.45355,
+        "p99": 0.97,
+        "median": 0.836,
+        "mean": 0.8106811527904848,
+        "std": 0.12095272969561909
+      },
+      "healthy_life_expectancy": {
+        "min": 28.0,
+        "max": 74.475,
+        "p01": 45.486,
+        "p99": 73.1,
+        "median": 65.06,
+        "mean": 63.342416705552964,
+        "std": 6.722210788054021
+      },
+      "freedom": {
+        "min": 0.258,
+        "max": 0.985,
+        "p01": 0.373,
+        "p99": 0.96,
+        "median": 0.77,
+        "mean": 0.7478471837488458,
+        "std": 0.14013744559250424
+      },
+      "generosity": {
+        "min": -0.338,
+        "max": 0.703,
+        "p01": -0.28099999999999997,
+        "p99": 0.46625,
+        "median": -0.023,
+        "mean": 9.125117591721416e-05,
+        "std": 0.16107902378832115
+      },
+      "perceptions_of_corruption": {
+        "min": 0.035,
+        "max": 0.983,
+        "p01": 0.164,
+        "p99": 0.965,
+        "median": 0.8,
+        "mean": 0.7452083533365339,
+        "std": 0.18583484757655158
+      }
+    },
+    "file": "production_random_forest.joblib",
+    "saved_at": "2026-11-14T06:35:02.195133+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 917.6
+  },
+  "production_best": {
+    "kind": "production",
+    "model_key": "random_forest",
+    "model_name": "Random Forest",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "params": {
+      "n_estimators": 400,
+      "max_depth": 6,
+      "min_samples_leaf": 4,
+      "max_features": 0.4,
+      "random_state": 42,
+      "min_samples_split": 20
+    },
+    "trained_on_rows": 2199,
+    "group_val_metrics": {
+      "r2": 0.7926763226693379,
+      "mae": 0.41375051664123336,
+      "mse": 0.26678724930311454,
+      "rmse": 0.5165145199344492,
+      "max_error": 1.5854408854293833,
+      "bias": 4.54539009831725e-05,
+      "n": 319,
+      "adj_r2": 0.7886893288745174
+    },
+    "group_test_metrics": {
+      "r2": 0.7310566350885881,
+      "mae": 0.39465886948623424,
+      "mse": 0.2712515451975205,
+      "rmse": 0.5208181498349692,
+      "max_error": 1.7398967923368103,
+      "bias": -0.03657017168303188,
+      "n": 303,
+      "adj_r2": 0.7256050803944378
+    },
+    "feature_ranges": {
+      "log_gdp_per_capita": {
+        "min": 5.527,
+        "max": 11.664,
+        "p01": 6.90656,
+        "p99": 11.440819999999993,
+        "median": 9.499,
+        "mean": 9.389760440569068,
+        "std": 1.1534019906135593
+      },
+      "social_support": {
+        "min": 0.228,
+        "max": 0.987,
+        "p01": 0.45355,
+        "p99": 0.97,
+        "median": 0.836,
+        "mean": 0.8106811527904848,
+        "std": 0.12095272969561909
+      },
+      "healthy_life_expectancy": {
+        "min": 28.0,
+        "max": 74.475,
+        "p01": 45.486,
+        "p99": 73.1,
+        "median": 65.06,
+        "mean": 63.342416705552964,
+        "std": 6.722210788054021
+      },
+      "freedom": {
+        "min": 0.258,
+        "max": 0.985,
+        "p01": 0.373,
+        "p99": 0.96,
+        "median": 0.77,
+        "mean": 0.7478471837488458,
+        "std": 0.14013744559250424
+      },
+      "generosity": {
+        "min": -0.338,
+        "max": 0.703,
+        "p01": -0.28099999999999997,
+        "p99": 0.46625,
+        "median": -0.023,
+        "mean": 9.125117591721416e-05,
+        "std": 0.16107902378832115
+      },
+      "perceptions_of_corruption": {
+        "min": 0.035,
+        "max": 0.983,
+        "p01": 0.164,
+        "p99": 0.965,
+        "median": 0.8,
+        "mean": 0.7452083533365339,
+        "std": 0.18583484757655158
+      }
+    },
+    "conformal": {
+      "method": "Split-conformal (country-grouped)",
+      "coverage_target": 0.9,
+      "q_cv": 0.9374943494488717,
+      "q_split": 0.8762348828470792,
+      "empirical_test_coverage_split": 0.9174917491749175,
+      "empirical_oof_coverage_cv": 0.9004092769440655,
+      "n_calibration": 319,
+      "n_test": 303
+    },
+    "adaptive": {
+      "method": "Normalised split-conformal (country-grouped cross-conformal, random-forest difficulty model)",
+      "coverage_target": 0.9,
+      "q_norm": 2.2096018426288606,
+      "floor": 0.1,
+      "coverage_all": 0.9004092769440655,
+      "coverage_very_low": 0.75,
+      "coverage_very_high": 0.7689243027888446,
+      "mean_halfwidth": 0.9692734046404796,
+      "min_halfwidth": 0.2922450541378605,
+      "max_halfwidth": 2.1430176140794313,
+      "fixed_q": 0.9374943494488726,
+      "fixed_coverage_all": 0.9004092769440655,
+      "fixed_coverage_very_low": 0.6813725490196079,
+      "fixed_coverage_very_high": 0.8685258964143426,
+      "oof_rmse": 0.5676772151437683,
+      "extremes": [
+        {
+          "actual_band": "< 4 (very low)",
+          "n": 204,
+          "bias_actual_minus_pred": -0.7764459961664879,
+          "mae": 0.7808214611431342,
+          "rmse": 0.908753965899142
+        },
+        {
+          "actual_band": "4\u20135",
+          "n": 584,
+          "bias_actual_minus_pred": -0.17168144484923847,
+          "mae": 0.38514042992622083,
+          "rmse": 0.4922836874389643
+        },
+        {
+          "actual_band": "5\u20136",
+          "n": 673,
+          "bias_actual_minus_pred": 0.03890357470815975,
+          "mae": 0.38439568511792177,
+          "rmse": 0.4970170277930694
+        },
+        {
+          "actual_band": "6\u20137",
+          "n": 487,
+          "bias_actual_minus_pred": 0.26948593493405143,
+          "mae": 0.42109849972003305,
+          "rmse": 0.5441224967426088
+        },
+        {
+          "actual_band": "\u2265 7 (very high)",
+          "n": 251,
+          "bias_actual_minus_pred": 0.4147567110468379,
+          "mae": 0.43713175943247357,
+          "rmse": 0.5928234149295252
+        }
+      ]
+    },
+    "is_best": true,
+    "file": "production_best.joblib",
+    "saved_at": "2026-11-14T06:35:02.269421+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 917.6
+  },
+  "production_gradient_boosting": {
+    "kind": "production",
+    "model_key": "gradient_boosting",
+    "model_name": "Gradient Boosting",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "params": {
+      "n_estimators": 500,
+      "learning_rate": 0.017240892195821537,
+      "max_depth": 2,
+      "subsample": 0.8446612641953124,
+      "random_state": 42,
+      "min_samples_leaf": 1
+    },
+    "trained_on_rows": 2199,
+    "group_val_metrics": {
+      "r2": 0.7853734548155289,
+      "mae": 0.41020780098357,
+      "mse": 0.2761846903085355,
+      "rmse": 0.5255327680635485,
+      "max_error": 1.689064605218472,
+      "bias": 0.007479258465651922,
+      "n": 319,
+      "adj_r2": 0.7812460212542891
+    },
+    "group_test_metrics": {
+      "r2": 0.7140707688309251,
+      "mae": 0.4040042723352125,
+      "mse": 0.2883831910011906,
+      "rmse": 0.5370132130601543,
+      "max_error": 1.9749314230267583,
+      "bias": -0.023897438852427944,
+      "n": 303,
+      "adj_r2": 0.7082749060369574
+    },
+    "feature_ranges": {
+      "log_gdp_per_capita": {
+        "min": 5.527,
+        "max": 11.664,
+        "p01": 6.90656,
+        "p99": 11.440819999999993,
+        "median": 9.499,
+        "mean": 9.389760440569068,
+        "std": 1.1534019906135593
+      },
+      "social_support": {
+        "min": 0.228,
+        "max": 0.987,
+        "p01": 0.45355,
+        "p99": 0.97,
+        "median": 0.836,
+        "mean": 0.8106811527904848,
+        "std": 0.12095272969561909
+      },
+      "healthy_life_expectancy": {
+        "min": 28.0,
+        "max": 74.475,
+        "p01": 45.486,
+        "p99": 73.1,
+        "median": 65.06,
+        "mean": 63.342416705552964,
+        "std": 6.722210788054021
+      },
+      "freedom": {
+        "min": 0.258,
+        "max": 0.985,
+        "p01": 0.373,
+        "p99": 0.96,
+        "median": 0.77,
+        "mean": 0.7478471837488458,
+        "std": 0.14013744559250424
+      },
+      "generosity": {
+        "min": -0.338,
+        "max": 0.703,
+        "p01": -0.28099999999999997,
+        "p99": 0.46625,
+        "median": -0.023,
+        "mean": 9.125117591721416e-05,
+        "std": 0.16107902378832115
+      },
+      "perceptions_of_corruption": {
+        "min": 0.035,
+        "max": 0.983,
+        "p01": 0.164,
+        "p99": 0.965,
+        "median": 0.8,
+        "mean": 0.7452083533365339,
+        "std": 0.18583484757655158
+      }
+    },
+    "file": "production_gradient_boosting.joblib",
+    "saved_at": "2026-11-14T06:35:03.159326+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 101.2
+  },
+  "production_xgboost": {
+    "kind": "production",
+    "model_key": "xgboost",
+    "model_name": "XGBoost",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "params": {
+      "n_estimators": 150,
+      "learning_rate": 0.03172768832582949,
+      "max_depth": 3,
+      "subsample": 0.6964101864104046,
+      "colsample_bytree": 0.7816441089227697,
+      "reg_lambda": 0.2895927274708838,
+      "random_state": 42,
+      "tree_method": "hist",
+      "verbosity": 0
+    },
+    "trained_on_rows": 2199,
+    "group_val_metrics": {
+      "r2": 0.7892086668499257,
+      "mae": 0.41359328210764923,
+      "mse": 0.27124948135254606,
+      "rmse": 0.5208161684822641,
+      "max_error": 1.6002223815917969,
+      "bias": -0.015593706256543582,
+      "n": 319,
+      "adj_r2": 0.7851549873662704
+    },
+    "group_test_metrics": {
+      "r2": 0.7349191824513079,
+      "mae": 0.3869889283699564,
+      "mse": 0.26735584789752753,
+      "rmse": 0.517064645762527,
+      "max_error": 1.9331730613708498,
+      "bias": -0.01636551648004613,
+      "n": 303,
+      "adj_r2": 0.7295459226361318
+    },
+    "feature_ranges": {
+      "log_gdp_per_capita": {
+        "min": 5.527,
+        "max": 11.664,
+        "p01": 6.90656,
+        "p99": 11.440819999999993,
+        "median": 9.499,
+        "mean": 9.389760440569068,
+        "std": 1.1534019906135593
+      },
+      "social_support": {
+        "min": 0.228,
+        "max": 0.987,
+        "p01": 0.45355,
+        "p99": 0.97,
+        "median": 0.836,
+        "mean": 0.8106811527904848,
+        "std": 0.12095272969561909
+      },
+      "healthy_life_expectancy": {
+        "min": 28.0,
+        "max": 74.475,
+        "p01": 45.486,
+        "p99": 73.1,
+        "median": 65.06,
+        "mean": 63.342416705552964,
+        "std": 6.722210788054021
+      },
+      "freedom": {
+        "min": 0.258,
+        "max": 0.985,
+        "p01": 0.373,
+        "p99": 0.96,
+        "median": 0.77,
+        "mean": 0.7478471837488458,
+        "std": 0.14013744559250424
+      },
+      "generosity": {
+        "min": -0.338,
+        "max": 0.703,
+        "p01": -0.28099999999999997,
+        "p99": 0.46625,
+        "median": -0.023,
+        "mean": 9.125117591721416e-05,
+        "std": 0.16107902378832115
+      },
+      "perceptions_of_corruption": {
+        "min": 0.035,
+        "max": 0.983,
+        "p01": 0.164,
+        "p99": 0.965,
+        "median": 0.8,
+        "mean": 0.7452083533365339,
+        "std": 0.18583484757655158
+      }
+    },
+    "file": "production_xgboost.joblib",
+    "saved_at": "2026-11-14T06:35:03.200351+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 34.7
+  },
+  "eval_random_linear": {
+    "kind": "evaluation",
+    "strategy": "random",
+    "model_key": "linear",
+    "model_name": "Linear Regression",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_random_linear.joblib",
+    "saved_at": "2026-11-14T06:35:03.836870+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 1.5
+  },
+  "eval_random_ridge": {
+    "kind": "evaluation",
+    "strategy": "random",
+    "model_key": "ridge",
+    "model_name": "Ridge Regression",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_random_ridge.joblib",
+    "saved_at": "2026-11-14T06:35:03.838982+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 1.5
+  },
+  "eval_random_lasso": {
+    "kind": "evaluation",
+    "strategy": "random",
+    "model_key": "lasso",
+    "model_name": "Lasso Regression",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_random_lasso.joblib",
+    "saved_at": "2026-11-14T06:35:03.841137+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 1.5
+  },
+  "eval_random_decision_tree": {
+    "kind": "evaluation",
+    "strategy": "random",
+    "model_key": "decision_tree",
+    "model_name": "Decision Tree",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_random_decision_tree.joblib",
+    "saved_at": "2026-11-14T06:35:03.843439+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 5.3
+  },
+  "eval_random_random_forest": {
+    "kind": "evaluation",
+    "strategy": "random",
+    "model_key": "random_forest",
+    "model_name": "Random Forest",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_random_random_forest.joblib",
+    "saved_at": "2026-11-14T06:35:04.226555+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 8150.1
+  },
+  "eval_random_gradient_boosting": {
+    "kind": "evaluation",
+    "strategy": "random",
+    "model_key": "gradient_boosting",
+    "model_name": "Gradient Boosting",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_random_gradient_boosting.joblib",
+    "saved_at": "2026-11-14T06:35:04.251836+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 457.2
+  },
+  "eval_random_xgboost": {
+    "kind": "evaluation",
+    "strategy": "random",
+    "model_key": "xgboost",
+    "model_name": "XGBoost",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_random_xgboost.joblib",
+    "saved_at": "2026-11-14T06:35:04.284773+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 586.5
+  },
+  "eval_group_linear": {
+    "kind": "evaluation",
+    "strategy": "group",
+    "model_key": "linear",
+    "model_name": "Linear Regression",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_group_linear.joblib",
+    "saved_at": "2026-11-14T06:35:04.287514+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 1.5
+  },
+  "eval_group_ridge": {
+    "kind": "evaluation",
+    "strategy": "group",
+    "model_key": "ridge",
+    "model_name": "Ridge Regression",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_group_ridge.joblib",
+    "saved_at": "2026-11-14T06:35:04.289766+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 1.5
+  },
+  "eval_group_lasso": {
+    "kind": "evaluation",
+    "strategy": "group",
+    "model_key": "lasso",
+    "model_name": "Lasso Regression",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_group_lasso.joblib",
+    "saved_at": "2026-11-14T06:35:04.291926+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 1.5
+  },
+  "eval_group_decision_tree": {
+    "kind": "evaluation",
+    "strategy": "group",
+    "model_key": "decision_tree",
+    "model_name": "Decision Tree",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_group_decision_tree.joblib",
+    "saved_at": "2026-11-14T06:35:04.294214+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 3.4
+  },
+  "eval_group_random_forest": {
+    "kind": "evaluation",
+    "strategy": "group",
+    "model_key": "random_forest",
+    "model_name": "Random Forest",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_group_random_forest.joblib",
+    "saved_at": "2026-11-14T06:35:04.364507+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 819.9
+  },
+  "eval_group_gradient_boosting": {
+    "kind": "evaluation",
+    "strategy": "group",
+    "model_key": "gradient_boosting",
+    "model_name": "Gradient Boosting",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_group_gradient_boosting.joblib",
+    "saved_at": "2026-11-14T06:35:04.381893+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 101.0
+  },
+  "eval_group_xgboost": {
+    "kind": "evaluation",
+    "strategy": "group",
+    "model_key": "xgboost",
+    "model_name": "XGBoost",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_group_xgboost.joblib",
+    "saved_at": "2026-11-14T06:35:04.387501+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 34.9
+  },
+  "eval_temporal_linear": {
+    "kind": "evaluation",
+    "strategy": "temporal",
+    "model_key": "linear",
+    "model_name": "Linear Regression",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_temporal_linear.joblib",
+    "saved_at": "2026-11-14T06:35:04.391344+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 1.5
+  },
+  "eval_temporal_ridge": {
+    "kind": "evaluation",
+    "strategy": "temporal",
+    "model_key": "ridge",
+    "model_name": "Ridge Regression",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_temporal_ridge.joblib",
+    "saved_at": "2026-11-14T06:35:04.394580+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 1.5
+  },
+  "eval_temporal_lasso": {
+    "kind": "evaluation",
+    "strategy": "temporal",
+    "model_key": "lasso",
+    "model_name": "Lasso Regression",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_temporal_lasso.joblib",
+    "saved_at": "2026-11-14T06:35:04.398851+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 1.5
+  },
+  "eval_temporal_decision_tree": {
+    "kind": "evaluation",
+    "strategy": "temporal",
+    "model_key": "decision_tree",
+    "model_name": "Decision Tree",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_temporal_decision_tree.joblib",
+    "saved_at": "2026-11-14T06:35:04.401144+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 3.8
+  },
+  "eval_temporal_random_forest": {
+    "kind": "evaluation",
+    "strategy": "temporal",
+    "model_key": "random_forest",
+    "model_name": "Random Forest",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_temporal_random_forest.joblib",
+    "saved_at": "2026-11-14T06:35:04.694930+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 6518.5
+  },
+  "eval_temporal_gradient_boosting": {
+    "kind": "evaluation",
+    "strategy": "temporal",
+    "model_key": "gradient_boosting",
+    "model_name": "Gradient Boosting",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_temporal_gradient_boosting.joblib",
+    "saved_at": "2026-11-14T06:35:04.721912+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 529.3
+  },
+  "eval_temporal_xgboost": {
+    "kind": "evaluation",
+    "strategy": "temporal",
+    "model_key": "xgboost",
+    "model_name": "XGBoost",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "feature_set": "core",
+    "file": "eval_temporal_xgboost.joblib",
+    "saved_at": "2026-11-14T06:35:04.764925+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 580.6
+  },
+  "production_best_difficulty": {
+    "kind": "difficulty",
+    "model_key": "random_forest",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption"
+    ],
+    "model_name": "Difficulty model (|residual|)",
+    "feature_set": "core",
+    "file": "production_best_difficulty.joblib",
+    "saved_at": "2026-11-14T06:35:02.330609+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 1115.0
+  },
+  "production_best_affect": {
+    "kind": "production",
+    "model_key": "random_forest",
+    "model_name": "Random Forest + emotional wellbeing",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption",
+      "positive_affect",
+      "negative_affect"
+    ],
+    "feature_set": "core_plus_affect",
+    "params": {
+      "n_estimators": 400,
+      "max_depth": 6,
+      "min_samples_leaf": 4,
+      "max_features": 0.4,
+      "random_state": 42,
+      "min_samples_split": 20
+    },
+    "trained_on_rows": 2199,
+    "adaptive": {
+      "method": "Normalised split-conformal (country-grouped cross-conformal, random-forest difficulty model)",
+      "coverage_target": 0.9,
+      "q_norm": 2.148738942369049,
+      "floor": 0.1,
+      "coverage_all": 0.9004092769440655,
+      "coverage_very_low": 0.7647058823529411,
+      "coverage_very_high": 0.7529880478087649,
+      "mean_halfwidth": 0.8915828038185041,
+      "min_halfwidth": 0.24843687235319456,
+      "max_halfwidth": 2.148190323007732,
+      "fixed_q": 0.8936444006526179,
+      "fixed_coverage_all": 0.9004092769440655,
+      "fixed_coverage_very_low": 0.6666666666666666,
+      "fixed_coverage_very_high": 0.8685258964143426,
+      "oof_rmse": 0.5353426145574108,
+      "extremes": [
+        {
+          "actual_band": "< 4 (very low)",
+          "n": 204,
+          "bias_actual_minus_pred": -0.7479634830860968,
+          "mae": 0.7510138600756866,
+          "rmse": 0.8637332726472762
+        },
+        {
+          "actual_band": "4\u20135",
+          "n": 584,
+          "bias_actual_minus_pred": -0.15165793182204831,
+          "mae": 0.36533544010411495,
+          "rmse": 0.47310883741280224
+        },
+        {
+          "actual_band": "5\u20136",
+          "n": 673,
+          "bias_actual_minus_pred": 0.06969479267462464,
+          "mae": 0.37803958780900965,
+          "rmse": 0.47765326187954094
+        },
+        {
+          "actual_band": "6\u20137",
+          "n": 487,
+          "bias_actual_minus_pred": 0.22175536464017884,
+          "mae": 0.369120998498139,
+          "rmse": 0.4857429354308004
+        },
+        {
+          "actual_band": "\u2265 7 (very high)",
+          "n": 251,
+          "bias_actual_minus_pred": 0.39331641349441654,
+          "mae": 0.4160092350884931,
+          "rmse": 0.5604978250104805
+        }
+      ]
+    },
+    "feature_ranges": {
+      "log_gdp_per_capita": {
+        "min": 5.527,
+        "max": 11.664,
+        "p01": 6.90656,
+        "p99": 11.440819999999993,
+        "median": 9.499,
+        "mean": 9.389760440569068,
+        "std": 1.1534019906135593
+      },
+      "social_support": {
+        "min": 0.228,
+        "max": 0.987,
+        "p01": 0.45355,
+        "p99": 0.97,
+        "median": 0.836,
+        "mean": 0.8106811527904848,
+        "std": 0.12095272969561909
+      },
+      "healthy_life_expectancy": {
+        "min": 28.0,
+        "max": 74.475,
+        "p01": 45.486,
+        "p99": 73.1,
+        "median": 65.06,
+        "mean": 63.342416705552964,
+        "std": 6.722210788054021
+      },
+      "freedom": {
+        "min": 0.258,
+        "max": 0.985,
+        "p01": 0.373,
+        "p99": 0.96,
+        "median": 0.77,
+        "mean": 0.7478471837488458,
+        "std": 0.14013744559250424
+      },
+      "generosity": {
+        "min": -0.338,
+        "max": 0.703,
+        "p01": -0.28099999999999997,
+        "p99": 0.46625,
+        "median": -0.023,
+        "mean": 9.125117591721416e-05,
+        "std": 0.16107902378832115
+      },
+      "perceptions_of_corruption": {
+        "min": 0.035,
+        "max": 0.983,
+        "p01": 0.164,
+        "p99": 0.965,
+        "median": 0.8,
+        "mean": 0.7452083533365339,
+        "std": 0.18583484757655158
+      },
+      "positive_affect": {
+        "min": 0.179,
+        "max": 0.884,
+        "p01": 0.39248,
+        "p99": 0.8355199999999995,
+        "median": 0.663,
+        "mean": 0.6521475862068966,
+        "std": 0.10591256227939509
+      },
+      "negative_affect": {
+        "min": 0.083,
+        "max": 0.705,
+        "p01": 0.114,
+        "p99": 0.5175399999999996,
+        "median": 0.261,
+        "mean": 0.2714933577645442,
+        "std": 0.08687151308853372
+      }
+    },
+    "conformal": {
+      "q_cv": 0.8936444006526179
+    },
+    "file": "production_best_affect.joblib",
+    "saved_at": "2026-11-14T06:35:03.767425+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 912.2
+  },
+  "production_best_affect_difficulty": {
+    "kind": "difficulty",
+    "model_key": "random_forest",
+    "features": [
+      "log_gdp_per_capita",
+      "social_support",
+      "healthy_life_expectancy",
+      "freedom",
+      "generosity",
+      "perceptions_of_corruption",
+      "positive_affect",
+      "negative_affect"
+    ],
+    "model_name": "Difficulty model (|residual|)",
+    "feature_set": "core_plus_affect",
+    "file": "production_best_affect_difficulty.joblib",
+    "saved_at": "2026-11-14T06:35:03.834272+00:00",
+    "versions": {
+      "python": "3.13.18",
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1"
+    },
+    "size_kb": 1119.5
+  }
+}

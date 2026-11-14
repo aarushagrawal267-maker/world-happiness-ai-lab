@@ -183,7 +183,7 @@ python -m pip install --upgrade pip
 ```bash
 pip install -r requirements.txt
 ```
-(macOS/Linux: `source .venv/bin/activate`.) If PowerShell blocks activation, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once.
+(Developer extras for rebuilding the notebook: `pip install -r requirements-dev.txt`.) (macOS/Linux: `source .venv/bin/activate`.) If PowerShell blocks activation, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once.
 
 ## 14. Dataset setup
 The datasets are already included in `data/raw/`. To re-download and re-verify them:
@@ -200,6 +200,16 @@ streamlit run app.py
 ```
 The browser opens at <http://localhost:8501>. On the very first launch (or after a library upgrade) the app trains its models
 automatically with a compact search (≈1–3 minutes on a laptop CPU); afterwards everything loads from `models/`.
+
+## 15b. Deploy with a public URL (Streamlit Community Cloud — free)
+1. Sign in at <https://share.streamlit.io> with the GitHub account that owns this repository.
+2. Click **Create app → Deploy a public app from GitHub**.
+3. Repository: `aarushagrawal267-maker/world-happiness-ai-lab`, branch: the branch containing this code, main file path: `app.py`.
+4. Under **Advanced settings** choose Python **3.12**, then **Deploy**.
+
+The first build installs `requirements.txt` (a few minutes). Trained models are committed in `models/` and the library versions are pinned to match,
+so the app opens immediately without retraining; if versions ever differ, it retrains itself automatically (≈2–5 min on the free tier).
+You get a URL like `https://<your-app-name>.streamlit.app`. Every push to the branch redeploys the app.
 
 ## 16. Train models
 ```bash
