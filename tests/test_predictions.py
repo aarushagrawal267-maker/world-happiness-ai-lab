@@ -115,3 +115,26 @@ def test_overview_and_insights_from_real_data(bundle):
     assert all(i.source and i.metric and i.value for i in ins)
     top = bundle.rankings[bundle.rankings["year"] == ro["year"]].nlargest(1, "ladder_score")["country"].iloc[0]
     assert top in ins[0].text  # ranking insight reflects the actual data
+
+
+def test_adaptive_interval_calibrated_and_wider_for_hard_cases(frame):
+    from src.train import adaptive_interval
+
+    small = frame.sample(900, random_state=3)
+    info, diff = adaptive_interval(small, INDICATORS, "ridge", {}, 0.9)
+    assert 0.85 <= info["coverage_all"] <= 0.95
+    assert info["max_halfwidth"] > info["min_halfwidth"] > 0
+    assert {r["actual_band"] for r in info["extremes"]} >= {"< 4 (very low)", "≥ 7 (very high)"}
+    s = diff.predict(frame[INDICATORS].iloc[:20])
+    assert np.isfinite(s).all() and (s >= 0).all()
+
+
+def test_adaptive_prediction_and_extreme_warning(ridge_pipeline, frame, specs):
+    from src.prediction import extreme_warning
+    from src.train import adaptive_interval
+
+    info, diff = adaptive_interval(frame.sample(700, random_state=4), INDICATORS, "ridge", {}, 0.9)
+    vals = {f: s.default for f, s in specs.items()}
+    out = predict_one(ridge_pipeline, vals, INDICATORS, difficulty=diff, adaptive=info)
+    assert out["lower"] < out["prediction"] < out["upper"]
+    assert extreme_warning(3.5, info) and extreme_warning(7.2, info) and extreme_warning(5.5, info) is None

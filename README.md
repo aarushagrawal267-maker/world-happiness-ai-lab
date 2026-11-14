@@ -229,7 +229,7 @@ causal forecast; extrapolation beyond the observed data is flagged.
 ```bash
 python -m pytest -q
 ```
-103 tests cover loading, validation, country-name standardisation, missing values, feature engineering, statistics, every model,
+105 tests cover loading, validation, country-name standardisation, missing values, feature engineering, statistics, every model,
 splits without leakage, clustering, predictions and ranges, scenarios, map data preparation, visualisation inputs, insights and persistence.
 
 ## 20. Results snapshot
@@ -254,7 +254,8 @@ From the training run of 2026-11-13 (full details, tables and figures in [`PROJE
 * Random Forest was selected on validation RMSE for unseen countries (0.517): test R² 0.731, MAE 0.395 on 25 held-out countries.
 * 5-fold CV: random K-fold RMSE 0.506 vs country-grouped 0.565 for Random Forest — random splits look ~12% better than reality for new countries.
 * Feature engineering (year + region + GDP growth) lowers grouped CV RMSE from 0.565 to 0.545 (Random Forest).
-* 90% split-conformal interval ±0.94 points; 91.7% empirical coverage on unseen countries.
+* **Adaptive 90% prediction intervals** (normalised conformal with a learned difficulty model): width ±0.29 to ±2.14 depending on the profile; 90.0% coverage overall and 75% for very unhappy countries (fixed-width interval: 68%).
+* **Extremes:** like any imperfect model, predictions shrink toward the middle (actual < 4 over-estimated by ~0.78 on unseen countries). Stacking and recalibration were tested and gave little gain, so the app shows the measured bias as a warning and offers a companion model with positive/negative affect (grouped RMSE 0.535 vs 0.568) that captures crisis states better.
 * Permutation importance: log GDP > healthy life expectancy ≈ social support > freedom > corruption > generosity.
 * Clustering: k = 3 (silhouette 0.33) — very high-indicator / mid-range / low-indicator country profiles.
 

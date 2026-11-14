@@ -339,6 +339,20 @@ def generate_report() -> str:
       f"{cf['empirical_test_coverage_split']:.1%} coverage on {cf['n_test']} unseen test rows (target {cf['coverage_target']:.0%}). The production model uses ±{cf['q_cv']:.3f} "
       f"from grouped 5-fold out-of-fold residuals (coverage {cf['empirical_oof_coverage_cv']:.1%}).\n")
     w(f"![Actual vs predicted]({figs['avp']})\n")
+    ai = res.get("adaptive_interval")
+    if ai:
+        w("### 6.5 Extreme scores and adaptive intervals\n")
+        w("Out-of-fold (country-grouped) error of the selected model by *actual* score band. Positive bias = under-prediction:\n")
+        ex = pd.DataFrame(ai["extremes"])
+        if "affect_model" in res:
+            ex = ex.merge(pd.DataFrame(res["affect_model"]["extremes"])[["actual_band", "bias_actual_minus_pred", "rmse"]].rename(
+                columns={"bias_actual_minus_pred": "bias_with_affect", "rmse": "rmse_with_affect"}), on="actual_band")
+        w(md_table(ex, 3))
+        w(f"\nLike any imperfect predictor, the model shrinks extremes. Recalibration and stacking were tested and gave little improvement; the remaining error comes from information "
+          f"the indicators do not contain (conflict, collapse). Two remedies are deployed: (1) a **normalised conformal interval** whose width follows a learned difficulty model "
+          f"(half-width ±{ai['min_halfwidth']:.2f} to ±{ai['max_halfwidth']:.2f}); coverage {ai['coverage_all']:.1%} overall and {ai['coverage_very_low']:.0%} for actual scores below 4 "
+          f"(fixed-width: {ai['fixed_coverage_very_low']:.0%}); (2) an optional companion model adding positive/negative affect"
+          + (f" (grouped RMSE {res['affect_model']['oof_rmse']:.3f} vs {ai['oof_rmse']:.3f})" if "affect_model" in res else "") + ".\n")
 
     w("## 7. Explainable AI\n")
     w(f"Measured for the evaluation {best['name']} on the unseen-country test set ({len(split.test)} rows):\n")

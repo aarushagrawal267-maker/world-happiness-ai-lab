@@ -261,6 +261,61 @@ def conformal_calibration(frame: pd.DataFrame, features: list[str], key: str, pa
     }
 
 
+DIFFICULTY_PARAMS = {"n_estimators": 200, "min_samples_leaf": 10, "max_features": 0.6, "n_jobs": -1}
+DIFFICULTY_FLOOR = 0.10
+
+
+def extremes_report(y: np.ndarray, pred: np.ndarray) -> list[dict]:
+    """Bias / error of out-of-fold predictions by *actual* score band (shows shrinkage at the extremes)."""
+    rows = []
+    for name, lo, hi in (("< 4 (very low)", 0, 4), ("4–5", 4, 5), ("5–6", 5, 6), ("6–7", 6, 7), ("≥ 7 (very high)", 7, 10.01)):
+        m = (y >= lo) & (y < hi)
+        if m.sum():
+            e = y[m] - pred[m]
+            rows.append({"actual_band": name, "n": int(m.sum()), "bias_actual_minus_pred": float(e.mean()),
+                         "mae": float(np.abs(e).mean()), "rmse": float(np.sqrt((e ** 2).mean()))})
+    return rows
+
+
+def adaptive_interval(frame: pd.DataFrame, features: list[str], key: str, params: dict, coverage: float) -> tuple[dict, object]:
+    """Normalised (locally adaptive) split-conformal interval.
+
+    1. Country-grouped 5-fold out-of-fold predictions of the main model → residuals r.
+    2. A 'difficulty' model (random forest) learns |r| from the features; its own
+       predictions are also made out-of-fold (cross-conformal).
+    3. Score = |r| / difficulty; q = finite-sample 90% quantile of the scores.
+    Prediction interval = ŷ ± q · difficulty(x): wider for profiles where the model
+    has historically erred more (e.g. crisis-like or unusual combinations).
+    """
+    X, y, g = frame[features], frame[TARGET].to_numpy(), frame["country"].to_numpy()
+    oof = np.zeros(len(frame))
+    for tr, te in GroupKFold(n_splits=5).split(X, y, g):
+        oof[te] = make_pipeline(key, features, params).fit(X.iloc[tr], y[tr]).predict(X.iloc[te])
+    absr = np.abs(y - oof)
+    s_oof = np.zeros(len(frame))
+    for tr, te in GroupKFold(n_splits=5).split(X, y, g):
+        s_oof[te] = make_pipeline("random_forest", features, DIFFICULTY_PARAMS).fit(X.iloc[tr], absr[tr]).predict(X.iloc[te])
+    s_oof = np.maximum(s_oof, DIFFICULTY_FLOOR)
+    q = conformal_quantile(absr / s_oof, coverage)
+    half = q * s_oof
+    covered = absr <= half
+    q_fixed = conformal_quantile(absr, coverage)
+    fixed_cov = absr <= q_fixed
+    difficulty = make_pipeline("random_forest", features, DIFFICULTY_PARAMS).fit(X, absr)
+    lo, hi = y < 4, y >= 7
+    info = {
+        "method": "Normalised split-conformal (country-grouped cross-conformal, random-forest difficulty model)",
+        "coverage_target": coverage, "q_norm": q, "floor": DIFFICULTY_FLOOR,
+        "coverage_all": float(covered.mean()), "coverage_very_low": float(covered[lo].mean()), "coverage_very_high": float(covered[hi].mean()),
+        "mean_halfwidth": float(half.mean()), "min_halfwidth": float(half.min()), "max_halfwidth": float(half.max()),
+        "fixed_q": q_fixed, "fixed_coverage_all": float(fixed_cov.mean()), "fixed_coverage_very_low": float(fixed_cov[lo].mean()),
+        "fixed_coverage_very_high": float(fixed_cov[hi].mean()),
+        "oof_rmse": float(np.sqrt(np.mean((y - oof) ** 2))),
+        "extremes": extremes_report(y, oof),
+    }
+    return info, difficulty
+
+
 def feature_ranges(frame: pd.DataFrame, features: list[str]) -> dict:
     out = {}
     for f in features:
@@ -364,6 +419,18 @@ def run_training(
     coverage = float(CFG["modeling"]["conformal_coverage"])
     results["conformal"] = conformal_calibration(frame, features, best["key"], group_params[best["key"]], coverage, splits.get("group") or make_splits(frame, "group"))
     results["feature_ranges"] = feature_ranges(frame, features)
+    bk, bparams = best["key"], group_params[best["key"]]
+    progress(min(step / total_steps, 0.97), "Fitting adaptive intervals (core model)…")
+    adaptive, difficulty = adaptive_interval(frame, features, bk, bparams, coverage)
+    results["adaptive_interval"] = adaptive
+    # Optional companion model with emotional-wellbeing inputs (positive / negative affect)
+    affect_feats = feature_list("core_plus_affect") if "core_plus_affect" in FEATURE_SETS else None
+    affect_pack = None
+    if affect_feats and feature_set != "core_plus_affect":
+        progress(min(step / total_steps, 0.98), "Training companion model with emotional-wellbeing inputs…")
+        a_info, a_diff = adaptive_interval(frame, affect_feats, bk, bparams, coverage)
+        results["affect_model"] = {"key": bk, "name": MODEL_SPECS[bk].name, "features": affect_feats, "params": bparams, **a_info}
+        affect_pack = (affect_feats, a_info, a_diff)
     results["training_seconds"] = round(time.perf_counter() - t_start, 1)
 
     if save:
@@ -381,7 +448,19 @@ def run_training(
             }
             save_model(prod, f"production_{key}", meta)
             if key == best["key"]:
-                save_model(prod, "production_best", {**meta, "conformal": results["conformal"], "is_best": True})
+                save_model(prod, "production_best", {**meta, "conformal": results["conformal"], "adaptive": adaptive, "is_best": True})
+                save_model(difficulty, "production_best_difficulty", {"kind": "difficulty", "model_key": "random_forest", "features": features,
+                                                                       "model_name": "Difficulty model (|residual|)", "feature_set": feature_set})
+        if affect_pack:
+            af, ai, ad = affect_pack
+            prod_a = make_pipeline(bk, af, bparams).fit(frame[af], frame[TARGET])
+            save_model(prod_a, "production_best_affect", {
+                "kind": "production", "model_key": bk, "model_name": MODEL_SPECS[bk].name + " + emotional wellbeing", "features": af,
+                "feature_set": "core_plus_affect", "params": bparams, "trained_on_rows": int(len(frame)), "adaptive": ai,
+                "feature_ranges": feature_ranges(frame, af), "conformal": {"q_cv": ai["fixed_q"]},
+            })
+            save_model(ad, "production_best_affect_difficulty", {"kind": "difficulty", "model_key": "random_forest", "features": af,
+                                                                  "model_name": "Difficulty model (|residual|)", "feature_set": "core_plus_affect"})
         # evaluation models (fitted on training portion) for diagnostics / explainability
         for strategy in strategies:
             for key in models:
@@ -437,6 +516,10 @@ def main() -> None:  # pragma: no cover
     b = res["best_model"]
     print(f"\nBest model: {b['name']} (group val RMSE {b['val']['rmse']:.3f}, test RMSE {b['test']['rmse']:.3f})")
     print(f"Conformal 90% half-width: ±{res['conformal']['q_cv']:.3f}; empirical test coverage {res['conformal']['empirical_test_coverage_split']:.1%}")
+    ai = res["adaptive_interval"]
+    print(f"Adaptive 90% interval: coverage {ai['coverage_all']:.1%} (very low scores {ai['coverage_very_low']:.0%} vs fixed {ai['fixed_coverage_very_low']:.0%}); half-width {ai['min_halfwidth']:.2f}–{ai['max_halfwidth']:.2f}")
+    if "affect_model" in res:
+        print(f"Companion model with emotional wellbeing: grouped OOF RMSE {res['affect_model']['oof_rmse']:.3f} vs core {ai['oof_rmse']:.3f}")
     print(f"Total time {res['training_seconds']} s")
 
 

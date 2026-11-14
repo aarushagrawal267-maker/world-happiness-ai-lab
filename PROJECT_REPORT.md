@@ -1,6 +1,6 @@
 # World Happiness AI Lab — Project Report
 
-*Generated automatically by `python -m src.report` on 2026-11-13 18:03 UTC from the data in `data/raw` and the experiment results in `outputs/reports/experiment_results.json` (training run 2026-11-13T18:00:37 UTC). Every number below is computed, not typed.*
+*Generated automatically by `python -m src.report` on 2026-11-14 06:36 UTC from the data in `data/raw` and the experiment results in `outputs/reports/experiment_results.json` (training run 2026-11-14T06:33:05 UTC). Every number below is computed, not typed.*
 
 > **Interpretation note.** Life Ladder scores are national averages of *reported* life evaluations (Cantril ladder, 0–10). All relationships reported here are statistical associations in observational country-level data and must not be read as causal effects.
 
@@ -248,6 +248,20 @@ Prediction intervals: Split-conformal (country-grouped); half-width ±0.876 cali
 
 ![Actual vs predicted](outputs/figures/08_actual_vs_predicted.png)
 
+### 6.5 Extreme scores and adaptive intervals
+
+Out-of-fold (country-grouped) error of the selected model by *actual* score band. Positive bias = under-prediction:
+
+| actual_band | n | bias_actual_minus_pred | mae | rmse | bias_with_affect | rmse_with_affect |
+|---|---|---|---|---|---|---|
+| < 4 (very low) | 204 | -0.776 | 0.781 | 0.909 | -0.748 | 0.864 |
+| 4–5 | 584 | -0.172 | 0.385 | 0.492 | -0.152 | 0.473 |
+| 5–6 | 673 | 0.039 | 0.384 | 0.497 | 0.070 | 0.478 |
+| 6–7 | 487 | 0.269 | 0.421 | 0.544 | 0.222 | 0.486 |
+| ≥ 7 (very high) | 251 | 0.415 | 0.437 | 0.593 | 0.393 | 0.560 |
+
+Like any imperfect predictor, the model shrinks extremes. Recalibration and stacking were tested and gave little improvement; the remaining error comes from information the indicators do not contain (conflict, collapse). Two remedies are deployed: (1) a **normalised conformal interval** whose width follows a learned difficulty model (half-width ±0.29 to ±2.14); coverage 90.0% overall and 75% for actual scores below 4 (fixed-width: 68%); (2) an optional companion model adding positive/negative affect (grouped RMSE 0.535 vs 0.568).
+
 ## 7. Explainable AI
 
 Measured for the evaluation Random Forest on the unseen-country test set (303 rows):
@@ -309,8 +323,8 @@ k = 3 has the best average rank across silhouette (↑), Davies–Bouldin (↓) 
 - **Regional differences** (Regions; Regional gap (pts) = 2.95; source `WHR2023_DataForTable2.1_panel.csv`; 2020–2022): Using one average per country (2020–2022), North America and ANZ has the highest mean Life Ladder (7.02) and South Asia the lowest (4.06). Kruskal–Wallis p < 0.001; η² = 0.64 (region accounts for about 64% of between-country variance).
 - **Life evaluations vs income** (Relationships; Residual vs GDP line = +1.46; source `WHR2023_DataForTable2.1_panel.csv`; 2022): In 2022, relative to a simple GDP-only line fitted to all country-years, Nicaragua reports life evaluations 1.46 points higher than its income alone would suggest, while Lebanon reports 3.16 points lower. Other factors matter beyond income.
 - **Most incomplete indicator** (Data quality; Missing share = 5.3%; source `WHR2023_DataForTable2.1_panel.csv`; 2005–2022): Corruption (perceived) is missing in 5.3% of country-years; missing inputs are imputed inside the model pipeline (training-fold statistics only) and target scores are never imputed.
-- **Best predictive model** (Machine learning; Test RMSE (unseen countries) = 0.521; source `outputs/reports/experiment_results.json`; 2026-11-13): Random Forest achieved the lowest validation RMSE on countries never seen in training (0.517 points); on a further held-out set of unseen countries its test RMSE is 0.521 (R² = 0.73).
-- **Random splits are optimistic** (Machine learning; Optimism gap = +12%; source `outputs/reports/experiment_results.json`; 2026-11-13): For Random Forest, random K-fold CV gives RMSE 0.506, but country-grouped CV gives 0.565 (+12%). Random splits let the model see other years of the same country, overstating accuracy for new countries.
+- **Best predictive model** (Machine learning; Test RMSE (unseen countries) = 0.521; source `outputs/reports/experiment_results.json`; 2026-11-14): Random Forest achieved the lowest validation RMSE on countries never seen in training (0.517 points); on a further held-out set of unseen countries its test RMSE is 0.521 (R² = 0.73).
+- **Random splits are optimistic** (Machine learning; Optimism gap = +12%; source `outputs/reports/experiment_results.json`; 2026-11-14): For Random Forest, random K-fold CV gives RMSE 0.506, but country-grouped CV gives 0.565 (+12%). Random splits let the model see other years of the same country, overstating accuracy for new countries.
 - **Most important predictor** (Machine learning; Δ RMSE when permuted = +0.198; source `Permutation importance (group test set)`): Shuffling Log GDP pc increases the best model's RMSE by 0.198 points on unseen countries — the largest permutation importance. Importance reflects the model's reliance, shared among correlated features, not causal effect.
 - **3 country profiles** (Clusters; Silhouette score = 0.33; source `WHR2023_DataForTable2.1_panel.csv`; 2020, 2021, 2022): K-means on the six indicators (Life Ladder not used for clustering) finds: Very high indicators · low perceived corruption, higher income, longer healthy lives (22 countries, mean ladder 7.01; e.g. Finland, Denmark, Iceland, Netherlands, Sweden) | Mid-range indicators · close to global average (70 countries, mean ladder 5.81; e.g. Israel, United States, Czechia, Lithuania, Slovenia) | Low indicators · shorter healthy lives, weaker social support, lower income (42 countries, mean ladder 4.29; e.g. Nepal, Congo (Brazzaville), Venezuela, Laos, Guinea). Silhouette = 0.33, indicating moderately separated, overlapping groups rather than sharp categories.
 

@@ -6,7 +6,7 @@ from src import ui
 from src import visualization as viz
 from src.config import TARGET
 from src.explainability import explain_instance
-from src.prediction import input_specs, mahalanobis_extrapolation, nearest_profiles, predict_one, validate_inputs
+from src.prediction import extreme_warning, input_specs, mahalanobis_extrapolation, nearest_profiles, predict_one, validate_inputs
 
 ui.page_header(
     "Happiness Prediction",
@@ -19,17 +19,26 @@ reg = ui.registry()
 b = ui.bundle()
 panel = b.panel
 
-choices = ["production_best"] + sorted(k for k, v in reg.items() if k.startswith(("production_", "custom_")) and k != "production_best")
+lead = [k for k in ("production_best", "production_best_affect") if k in reg]
+choices = lead + sorted(k for k, v in reg.items() if k.startswith(("production_", "custom_")) and k not in lead and not k.endswith("_difficulty"))
 c1, c2 = st.columns([1.2, 2])
 with c1:
-    mname = st.selectbox("Model", choices, format_func=lambda n: f"★ {reg[n]['model_name']} (best)" if n == "production_best" else f"{reg[n]['model_name']} · {n}")
+    mname = st.selectbox("Model", choices, format_func=lambda n: f"★ {reg[n]['model_name']} — 6 core indicators (recommended)" if n == "production_best"
+                         else (f"★ {reg[n]['model_name']} — 8 inputs (better for crisis profiles)" if n == "production_best_affect" else f"{reg[n]['model_name']} · {n}"))
 meta = reg[mname]
 pipe = ui.model(mname)
 feats = meta["features"]
 specs = input_specs(meta["feature_ranges"], feats)
+adaptive = meta.get("adaptive")
+difficulty = ui.model(mname + "_difficulty") if adaptive else None
 q = res["conformal"]["q_cv"] if mname == "production_best" else None
+interval_ok = bool(adaptive and difficulty is not None) or q is not None
+if mname == "production_best_affect":
+    ui.callout("This model also uses <b>positive and negative affect</b> (yesterday's emotions). They are themselves wellbeing measures, so this model is closer to "
+               "'explaining wellbeing with wellbeing' — but it captures crisis states (conflict, collapse) noticeably better: "
+               f"unseen-country RMSE {adaptive['oof_rmse']:.3f} vs {reg['production_best']['adaptive']['oof_rmse']:.3f} for the 6-indicator model.", "info")
 with c2:
-    st.markdown(f"<div style='padding-top:28px'>{ui.tags([(meta['model_name'], 'blue'), ('features: ' + meta['feature_set'], ''), ('trained on ' + str(meta.get('trained_on_rows', '—')) + ' country-years', ''), ('90% interval' if q else 'no calibrated interval', 'green' if q else 'orange')])}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='padding-top:28px'>{ui.tags([(meta['model_name'], 'blue'), ('features: ' + meta['feature_set'], ''), ('trained on ' + str(meta.get('trained_on_rows', '—')) + ' country-years', ''), ('adaptive 90% interval' if adaptive else ('90% interval' if q else 'no calibrated interval'), 'green' if interval_ok else 'orange')])}</div>", unsafe_allow_html=True)
 
 # --------------------------------------------------- prefill
 with st.expander("Start from a real country profile (optional)", expanded=False):
@@ -84,19 +93,27 @@ if go_btn or st.session_state.get("pred_last"):
         for e in errors:
             ui.callout(e, "danger")
         st.stop()
-    out = predict_one(pipe, values, feats, q)
+    out = predict_one(pipe, values, feats, q, difficulty=difficulty, adaptive=adaptive)
     maha = mahalanobis_extrapolation(panel, values, feats)
     c1, c2 = st.columns([1, 1.25], gap="large")
     with c1:
         ui.chart(viz.gauge(out["prediction"], out.get("lower"), out.get("upper"), "Estimated Life Ladder (0–10)"), key="gauge")
-        if q:
+        if "lower" in out:
             st.markdown(f"<div style='text-align:center;margin-top:-10px'><span class='tag blue'>90% prediction interval: {out['lower']:.2f} – {out['upper']:.2f}</span></div>", unsafe_allow_html=True)
-            st.caption(f"Split-conformal interval (±{q:.2f}) calibrated on countries unseen during training; empirical coverage {res['conformal']['empirical_oof_coverage_cv']:.0%}.")
+            if adaptive:
+                st.caption(f"Adaptive conformal interval: ±{out['interval_halfwidth']:.2f} for this profile (range across countries "
+                           f"±{adaptive['min_halfwidth']:.2f} to ±{adaptive['max_halfwidth']:.2f}). It widens where the model has historically erred more. "
+                           f"Validated coverage on unseen countries: {adaptive['coverage_all']:.0%} overall, {adaptive['coverage_very_low']:.0%} for very low scores.")
+            else:
+                st.caption(f"Split-conformal interval (±{q:.2f}) calibrated on countries unseen during training.")
         else:
             st.caption("Calibrated intervals are computed for the best production model only.")
     with c2:
         ui.stat_row([("Model", meta["model_name"]), ("Point estimate", f"{out['prediction']:.3f}"),
                      ("Profile typicality", f"{maha['percentile']:.0f}th pct"), ("Global mean", f"{panel[TARGET].mean():.2f}")])
+        ew = extreme_warning(out["prediction"], adaptive)
+        if ew:
+            ui.callout(ew, "warn", "⇅")
         for w in warns:
             ui.callout(w, "warn")
         if maha["unusual"]:
@@ -117,7 +134,7 @@ if go_btn or st.session_state.get("pred_last"):
     with c1:
         ui.chart(viz.waterfall(ex["contributions"], ex["base_value"], ex["prediction"], f"Contribution of each input · {ex['method']}"), key="pwf")
     with c2:
-        if mname.startswith("production_"):
+        if mname.startswith("production_") and reg.get(f"eval_group_{meta['model_key']}", {}).get("features") == feats:
             pi = ui.permutation_importance(f"eval_group_{meta['model_key']}", "group")
             ui.chart(viz.importance_bars(pi, "importance_mean", "importance_std", title="Global feature importance (permutation)", xtitle="Δ RMSE"), key="ppi")
     ui.section("Limitations", "")

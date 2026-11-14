@@ -90,8 +90,19 @@ def validate_inputs(values: dict, specs: dict[str, InputSpec]) -> tuple[list[str
     return errors, warns
 
 
-def predict_one(pipe, values: dict, features: list[str], conformal_q: float | None = None) -> dict:
+def predict_one(pipe, values: dict, features: list[str], conformal_q: float | None = None,
+                difficulty=None, adaptive: dict | None = None) -> dict:
+    """Point prediction + interval.
+
+    If a ``difficulty`` model and its ``adaptive`` calibration are given, the
+    half-width is q_norm × predicted difficulty (normalised conformal — wider
+    for profiles the model has historically found hard); otherwise the fixed
+    ``conformal_q`` half-width is used.
+    """
     row = pd.DataFrame([{f: values.get(f) for f in features}])
+    if difficulty is not None and adaptive:
+        s = max(float(difficulty.predict(row)[0]), adaptive.get("floor", 0.1))
+        conformal_q = adaptive["q_norm"] * s
     pred = float(pipe.predict(row)[0])
     out = {"prediction": pred, "clipped": False}
     if not 0 <= pred <= 10:
@@ -129,3 +140,21 @@ def mahalanobis_extrapolation(panel: pd.DataFrame, values: dict, features: list[
     ref = np.sqrt(np.einsum("ij,jk,ik->i", d - mu, inv, d - mu))
     pct = float((ref < md).mean() * 100)
     return {"distance": md, "percentile": pct, "unusual": pct > 99}
+
+
+def extreme_warning(prediction: float, adaptive: dict | None) -> str | None:
+    """Explain regression-to-the-mean near the ends of the scale using the measured
+    out-of-fold bias by actual-score band."""
+    if not adaptive or not adaptive.get("extremes"):
+        return None
+    bands = {r["actual_band"]: r for r in adaptive["extremes"]}
+    if prediction < 4.5 and "< 4 (very low)" in bands:
+        b = bands["< 4 (very low)"]
+        return (f"Low estimates are shrunk toward the middle: for country-years whose actual score was below 4, the model over-estimated by "
+                f"{-b['bias_actual_minus_pred']:.2f} points on average (n = {b['n']}, unseen-country validation). Crises such as conflict or economic collapse "
+                "are not fully captured by the indicators, so the true value may be lower — see the lower end of the interval.")
+    if prediction > 6.8 and "≥ 7 (very high)" in bands:
+        b = bands["≥ 7 (very high)"]
+        return (f"High estimates are shrunk toward the middle: for country-years whose actual score was 7 or above, the model under-estimated by "
+                f"{b['bias_actual_minus_pred']:.2f} points on average (n = {b['n']}). The true value may be higher.")
+    return None

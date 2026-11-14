@@ -74,6 +74,24 @@ if s == "group" and k == res["best_model"]["key"]:
     st.caption("Split-conformal intervals: the 90th percentile (finite-sample corrected) of absolute errors on data from countries the model never saw. "
                "They guarantee average coverage under exchangeability, not coverage for every individual country.")
 
+ai = res.get("adaptive_interval")
+if ai:
+    ui.section("Extreme scores & adaptive intervals", "", "country-grouped out-of-fold predictions on all data")
+    ex = pd.DataFrame(ai["extremes"])
+    if "affect_model" in res:
+        exa = pd.DataFrame(res["affect_model"]["extremes"])[["actual_band", "bias_actual_minus_pred", "rmse"]].rename(
+            columns={"bias_actual_minus_pred": "bias (+ emotions model)", "rmse": "rmse (+ emotions model)"})
+        ex = ex.merge(exa, on="actual_band")
+    st.dataframe(ui.fmt_table(ex), hide_index=True)
+    ui.callout("Every imperfect model shrinks the extremes: among countries that turned out very unhappy, errors are mostly over-estimates, because the indicators "
+               "do not capture everything (conflict, collapse, measurement). The companion model with emotional-wellbeing inputs reduces this; adaptive intervals "
+               "make the uncertainty honest where it is largest.", "info")
+    rows = [{"interval": "Fixed width", "coverage (all)": ai["fixed_coverage_all"], "coverage (actual < 4)": ai["fixed_coverage_very_low"],
+             "coverage (actual ≥ 7)": ai["fixed_coverage_very_high"], "half-width": f"±{ai['fixed_q']:.2f} everywhere"},
+            {"interval": "Adaptive (normalised conformal)", "coverage (all)": ai["coverage_all"], "coverage (actual < 4)": ai["coverage_very_low"],
+             "coverage (actual ≥ 7)": ai["coverage_very_high"], "half-width": f"±{ai['min_halfwidth']:.2f} to ±{ai['max_halfwidth']:.2f} (mean ±{ai['mean_halfwidth']:.2f})"}]
+    st.dataframe(ui.fmt_table(pd.DataFrame(rows)), hide_index=True)
+
 with st.expander("What each metric means"):
     for key, (n, d) in METRIC_INFO.items():
         st.markdown(f"- **{n}** — {d}")
