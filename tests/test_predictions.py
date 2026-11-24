@@ -78,6 +78,21 @@ def test_explainability(forest_pipeline, ridge_pipeline, frame):
     assert abs(ex["contributions"]["contribution"].sum() + ex["base_value"] - ex["prediction"]) < 0.05
 
 
+def test_engineered_feature_model_explained_from_modeling_frame(panel, frame):
+    """Saved custom models can use the 'engineered' feature set, whose gdp_growth_1y
+    exists only in the modelling frame (not the raw panel). The prediction page must
+    therefore take its explanation background from the modelling frame."""
+    from src.config import FEATURE_SETS
+    from src.regression_models import make_pipeline
+
+    feats = list(FEATURE_SETS["engineered"])
+    assert not set(feats) <= set(panel.columns) and set(feats) <= set(frame.columns)
+    pipe = make_pipeline("ridge", feats).fit(frame[feats], frame[TARGET])
+    bg = frame[feats].dropna()
+    ex = explain_instance(pipe, bg, bg.iloc[[0]])
+    assert np.isfinite(ex["prediction"]) and len(ex["contributions"]) > 0
+
+
 def test_map_data_preparation(bundle):
     y = int(bundle.rankings["year"].max())
     d = bundle.rankings[bundle.rankings["year"] == y]

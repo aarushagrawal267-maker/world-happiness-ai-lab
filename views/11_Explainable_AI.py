@@ -22,7 +22,7 @@ b = ui.bundle()
 keys = list(res["experiments"]["group"]["models"])
 k = st.selectbox("Model to explain", keys, index=keys.index(res["best_model"]["key"]), format_func=lambda x: MODEL_SPECS[x].name + (" ★ best" if x == res["best_model"]["key"] else ""))
 eval_name = f"eval_group_{k}"
-pipe = ui.model(eval_name)
+pipe = ui.require_model(eval_name)
 feats = reg[eval_name]["features"]
 frame = build_modeling_frame(b.panel)
 split = make_splits(frame, "group")
@@ -79,7 +79,7 @@ with t3:
 with t4:
     use_prod = st.toggle("Use production model (trained on all countries)", value=False,
                          help="Off: the evaluation model, which never saw test countries — honest errors for test countries. On: the model used by the prediction tools.")
-    pmodel = ui.model(f"production_{k}") if use_prod else pipe
+    pmodel = ui.require_model(f"production_{k}") if use_prod else pipe
     test_c = set(split.test["country"])
     opts = sorted(frame["country"].unique())
     default = next((c for c in ["Costa Rica", "Mexico", "Japan", "Finland"] if c in opts), opts[0])

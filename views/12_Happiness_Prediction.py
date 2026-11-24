@@ -7,6 +7,7 @@ from src import visualization as viz
 from src.config import TARGET
 from src.explainability import explain_instance
 from src.prediction import extreme_warning, input_specs, mahalanobis_extrapolation, nearest_profiles, predict_one, validate_inputs
+from src.train import build_modeling_frame
 
 ui.page_header(
     "Happiness Prediction",
@@ -18,6 +19,8 @@ res = ui.ensure_trained()
 reg = ui.registry()
 b = ui.bundle()
 panel = b.panel
+# Modelling frame = panel + backward-looking engineered features (e.g. gdp_growth_1y) that some saved models use.
+frame = build_modeling_frame(panel)
 
 lead = [k for k in ("production_best", "production_best_affect") if k in reg]
 choices = lead + sorted(k for k, v in reg.items() if k.startswith(("production_", "custom_")) and k not in lead and not k.endswith("_difficulty"))
@@ -26,7 +29,7 @@ with c1:
     mname = st.selectbox("Model", choices, format_func=lambda n: f"★ {reg[n]['model_name']} — 6 core indicators (recommended)" if n == "production_best"
                          else (f"★ {reg[n]['model_name']} — 8 inputs (better for crisis profiles)" if n == "production_best_affect" else f"{reg[n]['model_name']} · {n}"))
 meta = reg[mname]
-pipe = ui.model(mname)
+pipe = ui.require_model(mname)
 feats = meta["features"]
 specs = input_specs(meta["feature_ranges"], feats)
 adaptive = meta.get("adaptive")
@@ -45,7 +48,7 @@ with st.expander("Start from a real country profile (optional)", expanded=False)
     cc1, cc2, cc3 = st.columns([2, 1, 1])
     with cc1:
         pc = st.selectbox("Country", sorted(panel["country"].unique()), index=sorted(panel["country"].unique()).index("Brazil") if "Brazil" in set(panel["country"]) else 0)
-    rows = panel[panel["country"] == pc].sort_values("year")
+    rows = frame[frame["country"] == pc].sort_values("year")
     with cc2:
         py = st.selectbox("Year", rows["year"].tolist()[::-1])
     with cc3:
@@ -130,7 +133,7 @@ if go_btn or st.session_state.get("pred_last"):
     import pandas as pd
 
     row = pd.DataFrame([{f: values[f] for f in feats}])
-    ex = explain_instance(pipe, panel[feats].dropna(), row)
+    ex = explain_instance(pipe, frame[feats].dropna(), row)
     with c1:
         ui.chart(viz.waterfall(ex["contributions"], ex["base_value"], ex["prediction"], f"Contribution of each input · {ex['method']}"), key="pwf")
     with c2:

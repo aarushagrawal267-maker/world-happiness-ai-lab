@@ -360,6 +360,21 @@ def model(name: str):
     return get_model(name, p.stat().st_mtime if p.exists() else 0.0)
 
 
+def require_model(name: str):
+    """Load a saved model or stop the page with a clear, actionable message."""
+    m = model(name)
+    if m is None:
+        from .model_manager import model_path
+
+        st.error(
+            f"The saved model **{name}** could not be loaded from `models/{model_path(name).name}` — the file is missing, "
+            "corrupt or was saved with a different scikit-learn version. Retrain it with `python -m src.train` "
+            "(or on the ML Training Lab page for custom models), then reload this page."
+        )
+        st.stop()
+    return m
+
+
 def registry() -> dict:
     from .model_manager import read_registry
 
