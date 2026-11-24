@@ -10,6 +10,29 @@ intervals, a what-if scenario simulator and an automated insights engine — all
 > not an objective measurement of how happy every individual is. Every relationship the platform shows is a statistical
 > **association** in observational country-level data; none is presented as a cause.
 
+## Quick start
+```bash
+git clone https://github.com/aarushagrawal267-maker/world-happiness-ai-lab.git
+cd world-happiness-ai-lab
+python -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+streamlit run app.py               # opens http://localhost:8501
+python -m pytest -q                # optional: run the 105 automated tests
+```
+Datasets and trained models are already included, so the app works offline straight after installation.
+
+## Screenshots
+| Home dashboard | Global happiness explorer |
+|---|---|
+| ![Home](docs/screenshots/01_home.png) | ![World map](docs/screenshots/02_Global_Happiness_Explorer.png) |
+| **Happiness prediction** | **What-if simulator** |
+| ![Prediction](docs/screenshots/11_Happiness_Prediction.png) | ![What-if](docs/screenshots/12_What_If_Simulator.png) |
+| **Model comparison** | **Explainable AI** |
+| ![Models](docs/screenshots/08_Model_Comparison.png) | ![XAI](docs/screenshots/10_Explainable_AI.png) |
+
+More screenshots of every page are in [`docs/screenshots/`](docs/screenshots/).
+
 ---
 
 ## Contents
@@ -19,7 +42,7 @@ intervals, a what-if scenario simulator and an automated insights engine — all
 10. [Validation methodology](#10-validation-methodology) · 11. [Explainable AI](#11-explainable-ai) · 12. [Architecture](#12-project-architecture) ·
 13. [Installation (Windows)](#13-installation-windows) · 14. [Dataset setup](#14-dataset-setup) · 15. [Run the app](#15-run-the-application) ·
 16. [Train models](#16-train-models) · 17. [Prediction](#17-using-happiness-prediction) · 18. [What-if simulator](#18-using-the-what-if-simulator) ·
-19. [Tests](#19-automated-tests) · 20. [Results snapshot](#20-results-snapshot) · 21. [Limitations](#21-limitations) · 22. [Future work](#22-future-improvements)
+19. [Tests](#19-automated-tests) · 20. [Results snapshot](#20-results-snapshot) · 21. [Limitations](#21-limitations) · 22. [Future work](#22-future-improvements) · 23. [License](#23-license)
 
 ---
 
@@ -158,8 +181,9 @@ world-happiness-ai-lab/
 │   └── ui.py                   # Streamlit design system & cached accessors
 ├── data/raw/{whr_official,whr_panel,kaggle_unsdsn,uploads}/  data/reference/countries.csv
 ├── models/  outputs/{figures,reports}/  notebooks/exploratory_analysis.ipynb
-├── tests/  (8 files, 103 tests)   scripts/build_notebook.py
-├── config.yaml  requirements.txt  README.md  PROJECT_REPORT.md
+├── tests/  (8 files, 105 tests)   scripts/build_notebook.py
+├── .github/workflows/tests.yml  # CI: runs the test suite on every push
+├── config.yaml  requirements.txt  README.md  PROJECT_REPORT.md  LICENSE
 ```
 **Why `views/` instead of `pages/`?** Streamlit treats a folder named `pages/` as legacy auto-discovered pages: opening a page URL
 directly would run that page *without* `app.py` (no theme, no grouped navigation). Using `views/` with `st.navigation` guarantees
@@ -241,6 +265,7 @@ python -m pytest -q
 ```
 105 tests cover loading, validation, country-name standardisation, missing values, feature engineering, statistics, every model,
 splits without leakage, clustering, predictions and ranges, scenarios, map data preparation, visualisation inputs, insights and persistence.
+The same suite runs automatically on GitHub Actions for every push and pull request (`.github/workflows/tests.yml`).
 
 ## 20. Results snapshot
 From the training run of 2026-11-13 (full details, tables and figures in [`PROJECT_REPORT.md`](PROJECT_REPORT.md); numbers change slightly if you retrain with different library versions).
@@ -286,6 +311,10 @@ From the training run of 2026-11-13 (full details, tables and figures in [`PROJE
 * Quantile regression forests or conformalised quantile regression for heteroscedastic intervals.
 * Population-weighted global and regional aggregates.
 * Exportable PDF report from the app.
+
+## 23. License
+Code: MIT License (see [`LICENSE`](LICENSE)). The datasets in `data/raw/` keep their original terms: World Happiness Report data
+is published by the WHR editors for research and education (cite the report), and the Kaggle *unsdsn/world-happiness* files are CC0.
 
 ---
 *Data: World Happiness Report (Helliwell, Layard, Sachs, De Neve, Aknin, Wang, eds.), Gallup World Poll, UN SDSN, Wellbeing Research Centre (Oxford).*
