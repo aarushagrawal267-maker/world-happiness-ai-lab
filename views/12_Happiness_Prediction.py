@@ -110,7 +110,7 @@ if go_btn or st.session_state.get("pred_last"):
             st.caption("Calibrated intervals are computed for the best production model only.")
     with c2:
         ui.stat_row([("Model", meta["model_name"]), ("Point estimate", f"{out['prediction']:.3f}"),
-                     ("Profile typicality", f"{maha['percentile']:.0f}th pct"), ("Global mean", f"{panel[TARGET].mean():.2f}")])
+                     ("More unusual than", f"{maha['percentile']:.0f}% of data"), ("Global mean", f"{panel[TARGET].mean():.2f}")])
         ew = extreme_warning(out["prediction"], adaptive)
         if ew:
             ui.callout(ew, "warn", "⇅")
