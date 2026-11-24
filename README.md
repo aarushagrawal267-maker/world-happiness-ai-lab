@@ -11,6 +11,7 @@ intervals, a what-if scenario simulator and an automated insights engine — all
 > **association** in observational country-level data; none is presented as a cause.
 
 ## Quick start
+Needs **Python 3.12 or 3.13** (64-bit). Python 3.11 will not work: the pinned numpy/SciPy/XGBoost/SHAP versions need 3.12+.
 ```bash
 git clone https://github.com/aarushagrawal267-maker/world-happiness-ai-lab.git
 cd world-happiness-ai-lab
@@ -190,7 +191,7 @@ directly would run that page *without* `app.py` (no theme, no grouped navigation
 every page always goes through the entry point.
 
 ## 13. Installation (Windows)
-Requires Python 3.11 or newer (64-bit) from <https://www.python.org/downloads/>. In **PowerShell** or **Command Prompt**:
+Requires Python **3.12 or newer** (64-bit; 3.12 and 3.13 are tested — the pinned numpy, SciPy, XGBoost and SHAP versions do not support 3.11) from <https://www.python.org/downloads/>. In **PowerShell** or **Command Prompt**:
 
 ```bash
 cd path\to\world-happiness-ai-lab

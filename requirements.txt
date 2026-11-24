@@ -1,4 +1,4 @@
-# World Happiness AI Lab — exact versions (Python 3.11–3.13).
+# World Happiness AI Lab — exact versions (Python 3.12 or newer; numpy, scipy, xgboost and shap below require >= 3.12).
 # Pinned so the committed trained models in models/ load without retraining
 # (scikit-learn pickles are version-specific). CPU only.
 pandas==3.1.1
