@@ -49,7 +49,8 @@ with c2:
 with st.expander("Start from a real country profile (optional)", expanded=False):
     cc1, cc2, cc3 = st.columns([2, 1, 1])
     with cc1:
-        pc = st.selectbox("Country", sorted(panel["country"].unique()), index=sorted(panel["country"].unique()).index("Brazil") if "Brazil" in set(panel["country"]) else 0)
+        countries = sorted(frame["country"].unique())  # same source as the rows below, so every country has at least one year
+        pc = st.selectbox("Country", countries, index=countries.index("Brazil") if "Brazil" in countries else 0)
     rows = frame[frame["country"] == pc].sort_values("year")
     with cc2:
         py = st.selectbox("Year", rows["year"].tolist()[::-1])

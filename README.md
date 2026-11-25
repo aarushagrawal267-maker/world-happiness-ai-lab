@@ -19,7 +19,7 @@ python -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 streamlit run app.py               # opens http://localhost:8501
-python -m pytest -q                # optional: run the 108 automated tests
+python -m pytest -q                # optional: run the 109 automated tests
 ```
 Datasets and trained models are already included, so the app works offline straight after installation.
 
@@ -183,7 +183,7 @@ world-happiness-ai-lab/
 │   └── ui.py                   # Streamlit design system & cached accessors
 ├── data/raw/{whr_official,whr_panel,kaggle_unsdsn,uploads}/  data/reference/countries.csv
 ├── models/  outputs/{figures,reports}/  notebooks/exploratory_analysis.ipynb
-├── tests/  (8 files, 108 tests)   scripts/build_notebook.py
+├── tests/  (8 files, 109 tests)   scripts/build_notebook.py
 ├── .github/workflows/tests.yml  # CI: runs the test suite on every push
 ├── config.yaml  requirements.txt  README.md  PROJECT_REPORT.md  LICENSE
 ```
@@ -265,7 +265,7 @@ causal forecast; extrapolation beyond the observed data is flagged.
 ```bash
 python -m pytest -q
 ```
-108 tests cover loading, validation, country-name standardisation, missing values, feature engineering, statistics, every model,
+109 tests cover loading, validation, country-name standardisation, missing values, feature engineering, statistics, every model,
 splits without leakage, clustering, predictions and ranges, scenarios, map data preparation, visualisation inputs, insights and persistence.
 The same suite runs automatically on GitHub Actions for every push and pull request (`.github/workflows/tests.yml`).
 

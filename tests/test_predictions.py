@@ -153,3 +153,20 @@ def test_adaptive_prediction_and_extreme_warning(ridge_pipeline, frame, specs):
     out = predict_one(ridge_pipeline, vals, INDICATORS, difficulty=diff, adaptive=info)
     assert out["lower"] < out["prediction"] < out["upper"]
     assert extreme_warning(3.5, info) and extreme_warning(7.2, info) and extreme_warning(5.5, info) is None
+
+
+def test_model_cache_reloads_when_file_changes(monkeypatch):
+    """The model cache must key on the file's mtime; a retrained model file is then picked up
+    without restarting the app (a leading-underscore parameter would be ignored by Streamlit's hashing)."""
+    from src import model_manager, ui
+
+    calls = []
+    monkeypatch.setattr(model_manager, "load_model", lambda name: calls.append(name) or name)
+    ui.get_model.clear()
+    try:
+        ui.get_model("cache_probe", 1.0)
+        ui.get_model("cache_probe", 1.0)
+        ui.get_model("cache_probe", 2.0)
+    finally:
+        ui.get_model.clear()
+    assert calls == ["cache_probe", "cache_probe"]

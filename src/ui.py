@@ -347,7 +347,9 @@ def results():
 
 
 @st.cache_resource(show_spinner=False)
-def get_model(name: str, _mtime: float = 0.0):
+def get_model(name: str, mtime: float = 0.0):
+    # ``mtime`` is part of the cache key (no leading underscore, so Streamlit hashes it):
+    # a model file rewritten by `python -m src.train` is reloaded without restarting the app.
     from .model_manager import load_model
 
     return load_model(name)
@@ -422,7 +424,7 @@ def clustering(k: int | None = None, years: tuple[int, ...] | None = None):
 
 
 @st.cache_data(show_spinner="Computing permutation importance…")
-def get_permutation_importance(model_name: str, strategy: str, _mtime: float, n_repeats: int = 10) -> pd.DataFrame:
+def get_permutation_importance(model_name: str, strategy: str, mtime: float, n_repeats: int = 10) -> pd.DataFrame:
     from .config import TARGET
     from .explainability import permutation_importance_df
     from .train import build_modeling_frame, make_splits
