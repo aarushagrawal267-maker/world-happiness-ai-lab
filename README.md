@@ -19,7 +19,7 @@ python -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 streamlit run app.py               # opens http://localhost:8501
-python -m pytest -q                # optional: run the 106 automated tests
+python -m pytest -q                # optional: run the 108 automated tests
 ```
 Datasets and trained models are already included, so the app works offline straight after installation.
 
@@ -118,7 +118,8 @@ optional composite-index transformer are fitted on training folds only. Feature 
 `assert_no_leakage`. Hyper-parameters are tuned with `RandomizedSearchCV` (RF: n_estimators, max_depth, min_samples_split,
 min_samples_leaf, max_features; GB: n_estimators, learning_rate, max_depth, subsample; Ridge/Lasso: alpha; XGBoost and Decision Tree too).
 The deployed model is chosen by **validation RMSE on unseen countries** (MAE tie-break), refitted on all data, and given a
-**split-conformal 90% prediction interval**.
+**conformal 90% prediction interval** whose width adapts to the profile (see the results snapshot for how well it covers).
+Every split also reports two naive baselines that use no indicators (training mean and region mean) for context.
 
 ## 8. Clustering methodology
 Country profile = mean of the six indicators over 2020–2022 (gaps filled only from the same country's own history). Standardised
@@ -182,7 +183,7 @@ world-happiness-ai-lab/
 │   └── ui.py                   # Streamlit design system & cached accessors
 ├── data/raw/{whr_official,whr_panel,kaggle_unsdsn,uploads}/  data/reference/countries.csv
 ├── models/  outputs/{figures,reports}/  notebooks/exploratory_analysis.ipynb
-├── tests/  (8 files, 106 tests)   scripts/build_notebook.py
+├── tests/  (8 files, 108 tests)   scripts/build_notebook.py
 ├── .github/workflows/tests.yml  # CI: runs the test suite on every push
 ├── config.yaml  requirements.txt  README.md  PROJECT_REPORT.md  LICENSE
 ```
@@ -264,12 +265,12 @@ causal forecast; extrapolation beyond the observed data is flagged.
 ```bash
 python -m pytest -q
 ```
-106 tests cover loading, validation, country-name standardisation, missing values, feature engineering, statistics, every model,
+108 tests cover loading, validation, country-name standardisation, missing values, feature engineering, statistics, every model,
 splits without leakage, clustering, predictions and ranges, scenarios, map data preparation, visualisation inputs, insights and persistence.
 The same suite runs automatically on GitHub Actions for every push and pull request (`.github/workflows/tests.yml`).
 
 ## 20. Results snapshot
-From the training run of 2026-11-13 (full details, tables and figures in [`PROJECT_REPORT.md`](PROJECT_REPORT.md); numbers change slightly if you retrain with different library versions).
+From the training run of 2026-11-14 (full details, tables and figures in [`PROJECT_REPORT.md`](PROJECT_REPORT.md); numbers change slightly if you retrain with different library versions).
 
 **Data:** 2,199 country-years · 165 countries · 2005–2022 panel; official rankings to WHR 2026 (147 countries, survey years 2023–2025 — highest Finland 7.764, lowest Afghanistan 1.446).
 
@@ -286,12 +287,20 @@ From the training run of 2026-11-13 (full details, tables and figures in [`PROJE
 | **Random Forest** (selected) | 0.488 | **0.521** | 0.568 |
 | Gradient Boosting | 0.503 | 0.537 | 0.578 |
 | XGBoost | 0.489 | 0.517 | 0.569 |
+| *Baseline: training mean* | 1.115 | 1.011 | 1.145 |
+| *Baseline: region mean* | 0.719 | 0.687 | 0.797 |
 
 * Random Forest was selected on validation RMSE for unseen countries (0.517): test R² 0.731, MAE 0.395 on 25 held-out countries.
+  Knowing only a country's region already gives RMSE 0.687 on those countries; the six indicators cut that error by about a quarter.
+  The 25 test countries are a single draw: resampling whole countries gives a 95% interval of 0.40–0.65 for that RMSE, and the
+  Random Forest − XGBoost (−0.03 to +0.04) and Random Forest − Ridge (−0.12 to +0.02) differences both include 0, so this test set does not prove the forest beats a linear model on new countries.
 * 5-fold CV: random K-fold RMSE 0.506 vs country-grouped 0.565 for Random Forest — random splits look ~12% better than reality for new countries.
 * Feature engineering (year + region + GDP growth) lowers grouped CV RMSE from 0.565 to 0.545 (Random Forest).
-* **Adaptive 90% prediction intervals** (normalised conformal with a learned difficulty model): width ±0.29 to ±2.14 depending on the profile; 90.0% coverage overall and 75% for very unhappy countries (fixed-width interval: 68%).
-* **Extremes:** like any imperfect model, predictions shrink toward the middle (actual < 4 over-estimated by ~0.78 on unseen countries). Stacking and recalibration were tested and gave little gain, so the app shows the measured bias as a warning and offers a companion model with positive/negative affect (grouped RMSE 0.535 vs 0.568) that captures crisis states better.
+* **Prediction intervals.** A fixed-width split-conformal interval (±0.88, calibrated on validation countries) covered 91.7% of rows from the 25 unseen test countries.
+  The app uses an **adaptive 90% interval** (normalised conformal with a learned difficulty model), width ±0.29 to ±2.14 depending on the profile.
+  Its 90.0% overall coverage on the out-of-fold rows used to calibrate it holds by construction; on those rows it covers 75% of very unhappy country-years (fixed-width: 68%).
+  In a held-out check (interval refitted without the 25 test countries) it covered 92.7% overall but only 57% of the 21 test rows below 4 (fixed-width: 52%), so intervals for very unhappy countries are too narrow.
+* **Extremes:** like any imperfect model, predictions shrink toward the middle (actual < 4 over-estimated by ~0.78 on unseen countries). The app shows the measured bias as a warning and offers a companion model with positive/negative affect (grouped out-of-fold RMSE 0.535 vs 0.568) that captures crisis states better.
 * Permutation importance: log GDP > healthy life expectancy ≈ social support > freedom > corruption > generosity.
 * Clustering: k = 3 (silhouette 0.33) — very high-indicator / mid-range / low-indicator country profiles.
 
@@ -304,6 +313,9 @@ From the training run of 2026-11-13 (full details, tables and figures in [`PROJE
 * Coverage varies by year and some indicators are missing for some countries.
 * Positive/negative affect are excluded from the default model because they are themselves wellbeing measures.
 * What-if results describe model behaviour and are unreliable outside the observed data range.
+* The 90% intervals hold on average, not for every country: they under-cover very unhappy country-years (see the results snapshot).
+* Hyper-parameters tuned on the grouped split's training countries are reused in the all-data experiments (CV-scheme comparison, out-of-fold intervals), so those figures are slightly optimistic.
+* Each validation question uses one fixed split (e.g. 25 unseen test countries), so test metrics are noisy: the selected model's unseen-country RMSE has a 95% country-bootstrap interval of 0.40–0.65 (see `PROJECT_REPORT.md` §6.4).
 
 ## 22. Future improvements
 * Add the WHR 2024–2026 annual panels when they become publicly downloadable.

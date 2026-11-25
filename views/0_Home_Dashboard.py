@@ -69,7 +69,8 @@ if res:
                 unsafe_allow_html=True,
             )
     ui.callout(f"The prediction model is <b>{best['name']}</b>, selected by validation RMSE on held-out countries (not R² alone). "
-               f"Its 90% prediction interval is ±{res['conformal']['q_cv']:.2f} ladder points, with {res['conformal']['empirical_test_coverage_split']:.0%} empirical coverage on unseen test countries.", "ok", "◎")
+               f"A fixed-width 90% interval (±{res['conformal']['q_split']:.2f} ladder points, calibrated on validation countries) covered "
+               f"{res['conformal']['empirical_test_coverage_split']:.0%} of rows from unseen test countries; predictions use intervals calibrated on all data.", "ok", "◎")
 
 ui.section("Launch a tool", "04")
 tiles = [

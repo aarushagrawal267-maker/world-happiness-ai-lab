@@ -35,6 +35,8 @@ specs = input_specs(meta["feature_ranges"], feats)
 adaptive = meta.get("adaptive")
 difficulty = ui.model(mname + "_difficulty") if adaptive else None
 q = res["conformal"]["q_cv"] if mname == "production_best" else None
+# Independent coverage check on unseen countries (computed for the 6-indicator best model only).
+holdout = (res.get("adaptive_interval") or {}).get("holdout") if mname == "production_best" else None
 interval_ok = bool(adaptive and difficulty is not None) or q is not None
 if mname == "production_best_affect":
     ui.callout("This model also uses <b>positive and negative affect</b> (yesterday's emotions). They are themselves wellbeing measures, so this model is closer to "
@@ -106,7 +108,11 @@ if go_btn or st.session_state.get("pred_last"):
             if adaptive:
                 st.caption(f"Adaptive conformal interval: ±{out['interval_halfwidth']:.2f} for this profile (range across countries "
                            f"±{adaptive['min_halfwidth']:.2f} to ±{adaptive['max_halfwidth']:.2f}). It widens where the model has historically erred more. "
-                           f"Validated coverage on unseen countries: {adaptive['coverage_all']:.0%} overall, {adaptive['coverage_very_low']:.0%} for very low scores.")
+                           + (f"Held-out check on {holdout['countries_test']} unseen countries: {holdout['coverage_all']:.0%} coverage overall, "
+                              f"{holdout['coverage_very_low']:.0%} for actual scores below 4 (only {holdout['n_test_very_low']} rows), "
+                              "so treat it as a guide, not a guarantee." if holdout else
+                              f"Cross-validated coverage: {adaptive['coverage_all']:.0%} overall (calibrated to 90% by construction), "
+                              f"{adaptive['coverage_very_low']:.0%} for very low scores."))
             else:
                 st.caption(f"Split-conformal interval (±{q:.2f}) calibrated on countries unseen during training.")
         else:

@@ -41,6 +41,30 @@ def regression_metrics(y_true, y_pred, n_features: int | None = None) -> dict[st
     return out
 
 
+def cluster_bootstrap_rmse(y_true, preds: dict[str, np.ndarray], groups, n_boot: int = 2000, seed: int = 0) -> dict:
+    """95% percentile intervals for test RMSE, resampling whole countries (clusters) with replacement.
+
+    ``preds`` maps a model name to its predictions on the same rows. Returns, per model, the
+    RMSE interval, and for every pair the interval of the RMSE difference (first − second).
+    Country rows are dependent, so resampling rows would understate the uncertainty.
+    """
+    y = np.asarray(y_true, float)
+    codes, uniq = pd.factorize(pd.Series(groups))
+    k = len(uniq)
+    sq = {m: np.bincount(codes, weights=(y - np.asarray(p, float)) ** 2, minlength=k) for m, p in preds.items()}
+    cnt = np.bincount(codes, minlength=k).astype(float)
+    rng = np.random.default_rng(seed)
+    w = np.stack([np.bincount(rng.integers(0, k, k), minlength=k) for _ in range(n_boot)]).astype(float)
+    boot = {m: np.sqrt((w @ s) / (w @ cnt)) for m, s in sq.items()}
+    ci = lambda a: [float(v) for v in np.percentile(a, [2.5, 97.5])]  # noqa: E731
+    names = list(preds)
+    return {
+        "n_groups": int(k), "n_boot": n_boot,
+        "rmse_ci": {m: ci(b) for m, b in boot.items()},
+        "diff_ci": {f"{a} - {b}": ci(boot[a] - boot[b]) for i, a in enumerate(names) for b in names[i + 1:]},
+    }
+
+
 def residual_frame(meta: pd.DataFrame, y_true, y_pred) -> pd.DataFrame:
     out = meta.copy().reset_index(drop=True)
     out["actual"] = np.asarray(y_true, float)

@@ -1,6 +1,6 @@
 # World Happiness AI Lab — Project Report
 
-*Generated automatically by `python -m src.report` on 2026-11-14 06:36 UTC from the data in `data/raw` and the experiment results in `outputs/reports/experiment_results.json` (training run 2026-11-14T06:33:05 UTC). Every number below is computed, not typed.*
+*Generated automatically by `python -m src.report` on 2026-11-25 01:24 UTC from the data in `data/raw` and the experiment results in `outputs/reports/experiment_results.json` (training run 2026-11-14T06:33:05 UTC). Every number below is computed, not typed.*
 
 > **Interpretation note.** Life Ladder scores are national averages of *reported* life evaluations (Cantril ladder, 0–10). All relationships reported here are statistical associations in observational country-level data and must not be read as causal effects.
 
@@ -9,9 +9,9 @@
 - **Data:** 2,199 country-year observations for 165 countries (2005–2022) from the WHR 2023 annual panel, plus official WHR ranking tables for 14 ranking years up to **WHR 2026** (survey years 2023–2025, 147 countries).
 - **Latest ranking:** highest Finland (7.764), lowest Afghanistan (1.446); mean of countries 5.65.
 - **Strongest correlate:** Log GDP per capita (PPP) (r = 0.78, n = 2179). The six WHR indicators jointly explain R² = 0.75 of the variance in Life Ladder in a pooled OLS regression (n = 1962).
-- **Best model:** Random Forest, selected on validation RMSE for unseen countries: test RMSE **0.521**, MAE 0.395, R² 0.731 on 25 countries never seen in training.
+- **Best model:** Random Forest, selected on validation RMSE for unseen countries: test RMSE **0.521**, MAE 0.395, R² 0.731 on 25 countries never seen in training (naive baselines: training mean 1.011, region mean 0.687).
 - **Validation matters:** random K-fold CV understates error for new countries by 8% on average across models.
-- **Uncertainty:** split-conformal 90% intervals are ±0.94 ladder points; empirical coverage on unseen test countries 91.7%.
+- **Uncertainty:** a split-conformal 90% interval of ±0.88 ladder points (calibrated on validation countries) covered 91.7% of rows from unseen test countries. The app recalibrates on all data (fixed width ±0.94, or the adaptive interval described in 6.5).
 - **Clusters:** 3 country profiles (silhouette 0.33) — C1 Very high indicators · low perceived corruption, higher income, longer healthy lives; C2 Mid-range indicators · close to global average; C3 Low indicators · shorter healthy lives, weaker social support, lower income.
 
 ## 2. Data sources and preparation
@@ -218,6 +218,17 @@ Hyper-parameters were tuned with RandomizedSearchCV (scoring = RMSE), 20 iterati
 | Lasso Regression | 0.5866 | 0.5641 | 0.4268 | 0.7497 | 0.5786 | 0.5722 | True |
 | Decision Tree | 0.6089 | 0.6575 | 0.5083 | 0.6599 | 0.5601 | 0.4578 | True |
 
+**Naive baselines** (no indicators used; fitted on the training rows of each split, scored on the same validation/test rows):
+
+| question | baseline | val_rmse | test_rmse | test_mae | test_r2 | best_model_test_rmse |
+|---|---|---|---|---|---|---|
+| Random split | Training mean | 1.0818 | 1.1147 | 0.9272 | -0.0014 | 0.4881 |
+| Random split | Region mean (training rows) | 0.7117 | 0.7190 | 0.5581 | 0.5834 | 0.4881 |
+| Unseen countries (grouped) | Training mean | 1.2098 | 1.0114 | 0.8257 | -0.0142 | 0.5208 |
+| Unseen countries (grouped) | Region mean (training rows) | 0.8763 | 0.6869 | 0.5358 | 0.5321 | 0.5208 |
+| Future years (time-aware) | Training mean | 1.1124 | 1.1450 | 0.9371 | -0.0313 | 0.5679 |
+| Future years (time-aware) | Region mean (training rows) | 0.7410 | 0.7965 | 0.6199 | 0.5009 | 0.5679 |
+
 ![Models](outputs/figures/06_model_comparison.png)
 
 ### 6.3 Cross-validation strategy comparison (same model, same data)
@@ -238,13 +249,15 @@ Hyper-parameters were tuned with RandomizedSearchCV (scoring = RMSE), 20 iterati
 
 **Random Forest** — Lowest validation RMSE on held-out countries (country-grouped split); MAE as tie-breaker. R² is reported but not used alone. Tuned parameters: `{'n_estimators': 400, 'max_depth': 6, 'min_samples_leaf': 4, 'max_features': 0.4, 'min_samples_split': 20}`.
 
-| Question | Test RMSE | Test MAE | Test R² |
-|---|---|---|---|
-| Random split | 0.488 | 0.362 | 0.808 |
-| Unseen countries (grouped) | 0.521 | 0.395 | 0.731 |
-| Future years (time-aware) | 0.568 | 0.432 | 0.746 |
+| Question | Test RMSE | 95% CI (country bootstrap) | Test MAE | Test R² |
+|---|---|---|---|---|
+| Random split | 0.488 | 0.431–0.552 | 0.362 | 0.808 |
+| Unseen countries (grouped) | 0.521 | 0.400–0.650 | 0.395 | 0.731 |
+| Future years (time-aware) | 0.568 | 0.499–0.641 | 0.432 | 0.746 |
 
-Prediction intervals: Split-conformal (country-grouped); half-width ±0.876 calibrated on 319 validation rows gives 91.7% coverage on 303 unseen test rows (target 90%). The production model uses ±0.937 from grouped 5-fold out-of-fold residuals (coverage 90.0%).
+Intervals come from resampling whole test countries (25 on the unseen-country split, 2000 resamples), because rows of one country are not independent. 95% interval of the RMSE difference on unseen countries (Random Forest minus other): vs XGBoost -0.028 to +0.037; vs Ridge Regression -0.120 to +0.015 ladder points; an interval that contains 0 means this test set cannot tell the two models apart.
+
+Prediction intervals: Split-conformal (country-grouped); half-width ±0.876 calibrated on 319 validation rows gives 91.7% coverage on 303 unseen test rows (target 90%). The production fixed-width interval uses ±0.937, the 90% quantile of grouped 5-fold out-of-fold residuals on all data (its coverage on those same residuals is 90% by construction, so it is not a separate test).
 
 ![Actual vs predicted](outputs/figures/08_actual_vs_predicted.png)
 
@@ -260,7 +273,9 @@ Out-of-fold (country-grouped) error of the selected model by *actual* score band
 | 6–7 | 487 | 0.269 | 0.421 | 0.544 | 0.222 | 0.486 |
 | ≥ 7 (very high) | 251 | 0.415 | 0.437 | 0.593 | 0.393 | 0.560 |
 
-Like any imperfect predictor, the model shrinks extremes. Recalibration and stacking were tested and gave little improvement; the remaining error comes from information the indicators do not contain (conflict, collapse). Two remedies are deployed: (1) a **normalised conformal interval** whose width follows a learned difficulty model (half-width ±0.29 to ±2.14); coverage 90.0% overall and 75% for actual scores below 4 (fixed-width: 68%); (2) an optional companion model adding positive/negative affect (grouped RMSE 0.535 vs 0.568).
+Like any imperfect predictor, the model shrinks extremes; much of the remaining error plausibly comes from information the indicators do not contain (conflict, collapse). Post-hoc fixes such as recalibration or stacking are not part of this pipeline. Two remedies are deployed: (1) a **normalised conformal interval** whose width follows a learned difficulty model (half-width ±0.29 to ±2.14). On the out-of-fold rows used to calibrate it, overall coverage is 90.0% by construction, and 75% for actual scores below 4 (fixed-width: 68%); (2) an optional companion model adding positive/negative affect (grouped out-of-fold RMSE 0.535 vs 0.568).
+
+**Held-out check of the intervals.** Refitting the whole interval procedure on the train + validation countries only and scoring the 303 rows of the 25 unseen test countries: adaptive coverage 92.7% overall, 57% for actual scores below 4 and 68% for scores ≥ 7; fixed-width (±0.97) 91.7%, 52% and 88%. The test set holds only 21 rows below 4 (from 5 countries) and 25 rows ≥ 7, so the band-level figures are rough; in both checks the intervals under-cover very unhappy country-years.
 
 ## 7. Explainable AI
 
@@ -337,3 +352,5 @@ k = 3 has the best average rank across silhouette (↑), Davies–Bouldin (↓) 
 - The annual panel ends in 2022; WHR 2024–2026 rankings are included but provide explained-by contributions, not raw indicators.
 - Country coverage varies over time; some indicators (perceived corruption, healthy life expectancy) are missing for specific countries.
 - Model-based what-if scenarios describe model behaviour, not the consequences of real-world interventions.
+- Hyper-parameters tuned on the grouped split's training countries are reused in the all-data experiments (CV-scheme comparison, out-of-fold intervals), so those figures are slightly optimistic for the countries the tuning saw.
+- 90% intervals hold on average, not for every country: coverage is clearly lower for very low actual scores (see 6.5).

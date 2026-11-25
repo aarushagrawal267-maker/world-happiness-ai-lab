@@ -5,7 +5,7 @@ from src.config import INDICATORS, TARGET
 from src.evaluate import ForwardYearSplit, adjusted_r2, error_by_group, error_by_score_range, regression_metrics, residual_frame
 from src.regression_models import MODEL_KEYS, MODEL_SPECS, XGBOOST_AVAILABLE, make_pipeline, search_space
 from src.statistical_analysis import correlation_tests, group_comparison, ols_regression, country_level
-from src.train import conformal_quantile, fit_and_evaluate, make_splits
+from src.train import adaptive_interval_holdout, baseline_metrics, conformal_quantile, fit_and_evaluate, make_splits
 
 
 @pytest.mark.parametrize("key", MODEL_KEYS)
@@ -84,6 +84,27 @@ def test_error_breakdowns(frame, ridge_pipeline):
 def test_conformal_quantile():
     r = np.arange(1, 101, dtype=float)
     assert conformal_quantile(r, 0.9) == 91.0
+
+
+def test_baseline_metrics_use_training_rows_only(frame):
+    split = make_splits(frame, "group")
+    bl = baseline_metrics(split)
+    mu = split.train[TARGET].mean()
+    expected_rmse = float(np.sqrt(np.mean((split.test[TARGET] - mu) ** 2)))
+    assert bl["train_mean"]["test"]["rmse"] == pytest.approx(expected_rmse)
+    assert bl["train_mean"]["test"]["r2"] <= 0.01  # a constant predictor explains (almost) nothing
+    assert bl["region_mean"]["test"]["n"] == len(split.test)
+    assert bl["region_mean"]["test"]["rmse"] < bl["train_mean"]["test"]["rmse"]
+
+
+def test_adaptive_interval_holdout_is_scored_on_unseen_countries(frame):
+    split = make_splits(frame, "group")
+    h = adaptive_interval_holdout(split, INDICATORS, "ridge", {}, 0.9)
+    assert h["n_test"] == len(split.test) and h["n_calibration"] == len(split.train) + len(split.val)
+    assert h["countries_test"] == split.test["country"].nunique()
+    for k in ("coverage_all", "fixed_coverage_all", "coverage_very_low", "fixed_coverage_very_low"):
+        assert 0.0 <= h[k] <= 1.0
+    assert h["coverage_all"] > 0.7  # a 90% interval should not collapse on new countries
 
 
 def test_model_persistence_roundtrip(tmp_path, monkeypatch, ridge_pipeline, frame):

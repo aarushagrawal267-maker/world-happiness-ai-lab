@@ -42,6 +42,10 @@ st.dataframe(ui.fmt_table(lb, 4), hide_index=True, column_config={
     "val_rmse": st.column_config.ProgressColumn("val RMSE", min_value=0, max_value=float(lb["val_rmse"].max()) * 1.1, format="%.4f"),
     "test_r2": st.column_config.ProgressColumn("test R²", min_value=0, max_value=1, format="%.3f"),
 })
+bl = e.get("baselines")
+if bl:
+    st.caption(f"Naive baselines on the same test set (no indicators used, fitted on the training rows): training mean → RMSE {bl['train_mean']['test']['rmse']:.3f} "
+               f"(R² {bl['train_mean']['test']['r2']:.2f}); region mean → RMSE {bl['region_mean']['test']['rmse']:.3f} (R² {bl['region_mean']['test']['r2']:.2f}).")
 
 ui.section("Test performance across validation questions", "02")
 c1, c2 = st.columns(2)

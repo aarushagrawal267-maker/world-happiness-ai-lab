@@ -69,7 +69,7 @@ if s == "group" and k == res["best_model"]["key"]:
         {"label": "Interval half-width", "value": f"±{cf['q_split']:.2f}", "sub": f"calibrated on {cf['n_calibration']} validation rows", "icon": "↔"},
         {"label": "Empirical test coverage", "value": f"{cf['empirical_test_coverage_split']:.1%}", "sub": f"{cf['n_test']} rows of unseen countries", "icon": "✓",
          "accent": "linear-gradient(90deg,#4FE3C1,#9BE57A)"},
-        {"label": "Production half-width", "value": f"±{cf['q_cv']:.2f}", "sub": f"grouped 5-fold OOF, coverage {cf['empirical_oof_coverage_cv']:.1%}", "icon": "⟷"},
+        {"label": "Production half-width", "value": f"±{cf['q_cv']:.2f}", "sub": "90% quantile of grouped 5-fold OOF errors on all data", "icon": "⟷"},
     ])
     st.caption("Split-conformal intervals: the 90th percentile (finite-sample corrected) of absolute errors on data from countries the model never saw. "
                "They guarantee average coverage under exchangeability, not coverage for every individual country.")
@@ -90,7 +90,20 @@ if ai:
              "coverage (actual ≥ 7)": ai["fixed_coverage_very_high"], "half-width": f"±{ai['fixed_q']:.2f} everywhere"},
             {"interval": "Adaptive (normalised conformal)", "coverage (all)": ai["coverage_all"], "coverage (actual < 4)": ai["coverage_very_low"],
              "coverage (actual ≥ 7)": ai["coverage_very_high"], "half-width": f"±{ai['min_halfwidth']:.2f} to ±{ai['max_halfwidth']:.2f} (mean ±{ai['mean_halfwidth']:.2f})"}]
+    for r in rows:
+        r["evaluated on"] = "out-of-fold, all data (overall = 90% by construction)"
+    h = ai.get("holdout")
+    if h:
+        rows += [{"interval": "Fixed width — held-out check", "coverage (all)": h["fixed_coverage_all"], "coverage (actual < 4)": h["fixed_coverage_very_low"],
+                  "coverage (actual ≥ 7)": h["fixed_coverage_very_high"], "half-width": f"±{h['fixed_q']:.2f} everywhere",
+                  "evaluated on": f"{h['n_test']} rows of {h['countries_test']} unseen test countries"},
+                 {"interval": "Adaptive — held-out check", "coverage (all)": h["coverage_all"], "coverage (actual < 4)": h["coverage_very_low"],
+                  "coverage (actual ≥ 7)": h["coverage_very_high"], "half-width": f"mean ±{h['mean_halfwidth']:.2f}",
+                  "evaluated on": f"{h['n_test']} rows of {h['countries_test']} unseen test countries"}]
     st.dataframe(ui.fmt_table(pd.DataFrame(rows)), hide_index=True)
+    if h:
+        st.caption(f"Held-out rows: the whole interval procedure is fitted on the train + validation countries only. The test set has just {h['n_test_very_low']} rows "
+                   f"with actual score < 4 ({h['countries_test_very_low']} countries) and {h['n_test_very_high']} rows ≥ 7, so the band-level coverages are rough.")
 
 with st.expander("What each metric means"):
     for key, (n, d) in METRIC_INFO.items():

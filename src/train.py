@@ -277,6 +277,18 @@ def extremes_report(y: np.ndarray, pred: np.ndarray) -> list[dict]:
     return rows
 
 
+def _cross_conformal_scale(X: pd.DataFrame, y: np.ndarray, g: np.ndarray, key: str, features: list[str], params: dict) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Country-grouped 5-fold out-of-fold predictions, |residuals| and out-of-fold difficulty scale."""
+    oof = np.zeros(len(X))
+    for tr, te in GroupKFold(n_splits=5).split(X, y, g):
+        oof[te] = make_pipeline(key, features, params).fit(X.iloc[tr], y[tr]).predict(X.iloc[te])
+    absr = np.abs(y - oof)
+    s_oof = np.zeros(len(X))
+    for tr, te in GroupKFold(n_splits=5).split(X, y, g):
+        s_oof[te] = make_pipeline("random_forest", features, DIFFICULTY_PARAMS).fit(X.iloc[tr], absr[tr]).predict(X.iloc[te])
+    return oof, absr, np.maximum(s_oof, DIFFICULTY_FLOOR)
+
+
 def adaptive_interval(frame: pd.DataFrame, features: list[str], key: str, params: dict, coverage: float) -> tuple[dict, object]:
     """Normalised (locally adaptive) split-conformal interval.
 
@@ -286,16 +298,14 @@ def adaptive_interval(frame: pd.DataFrame, features: list[str], key: str, params
     3. Score = |r| / difficulty; q = finite-sample 90% quantile of the scores.
     Prediction interval = ŷ ± q · difficulty(x): wider for profiles where the model
     has historically erred more (e.g. crisis-like or unusual combinations).
+
+    ``coverage_all`` / ``fixed_coverage_all`` are measured on the same out-of-fold
+    scores that set ``q``, so they equal the target by construction; the per-band
+    coverages are diagnostics on those same rows. See
+    :func:`adaptive_interval_holdout` for an independent check on unseen countries.
     """
     X, y, g = frame[features], frame[TARGET].to_numpy(), frame["country"].to_numpy()
-    oof = np.zeros(len(frame))
-    for tr, te in GroupKFold(n_splits=5).split(X, y, g):
-        oof[te] = make_pipeline(key, features, params).fit(X.iloc[tr], y[tr]).predict(X.iloc[te])
-    absr = np.abs(y - oof)
-    s_oof = np.zeros(len(frame))
-    for tr, te in GroupKFold(n_splits=5).split(X, y, g):
-        s_oof[te] = make_pipeline("random_forest", features, DIFFICULTY_PARAMS).fit(X.iloc[tr], absr[tr]).predict(X.iloc[te])
-    s_oof = np.maximum(s_oof, DIFFICULTY_FLOOR)
+    oof, absr, s_oof = _cross_conformal_scale(X, y, g, key, features, params)
     q = conformal_quantile(absr / s_oof, coverage)
     half = q * s_oof
     covered = absr <= half
@@ -314,6 +324,55 @@ def adaptive_interval(frame: pd.DataFrame, features: list[str], key: str, params
         "extremes": extremes_report(y, oof),
     }
     return info, difficulty
+
+
+def adaptive_interval_holdout(split: SplitData, features: list[str], key: str, params: dict, coverage: float) -> dict:
+    """Independent check of the adaptive (and fixed-width) interval on unseen countries.
+
+    The whole interval procedure (out-of-fold residuals, difficulty model, quantile) is
+    run on the train + validation countries of the country-grouped split only, then
+    coverage is measured on the test countries, which play no part in calibration.
+    """
+    cal = pd.concat([split.train, split.val], ignore_index=True)
+    X, y, g = cal[features], cal[TARGET].to_numpy(), cal["country"].to_numpy()
+    _, absr, s_oof = _cross_conformal_scale(X, y, g, key, features, params)
+    q = conformal_quantile(absr / s_oof, coverage)
+    q_fixed = conformal_quantile(absr, coverage)
+    main = make_pipeline(key, features, params).fit(X, y)
+    difficulty = make_pipeline("random_forest", features, DIFFICULTY_PARAMS).fit(X, absr)
+    Xt, yt = split.test[features], split.test[TARGET].to_numpy()
+    r = np.abs(yt - main.predict(Xt))
+    half = q * np.maximum(difficulty.predict(Xt), DIFFICULTY_FLOOR)
+    covered, fixed_cov = r <= half, r <= q_fixed
+    lo, hi = yt < 4, yt >= 7
+    rate = lambda c, m: float(c[m].mean()) if m.any() else float("nan")  # noqa: E731
+    return {
+        "method": "Interval procedure fitted on train + validation countries of the grouped split; coverage measured on unseen test countries",
+        "n_calibration": int(len(cal)), "n_test": int(len(yt)), "countries_test": int(split.test["country"].nunique()),
+        "n_test_very_low": int(lo.sum()), "countries_test_very_low": int(split.test.loc[lo, "country"].nunique()), "n_test_very_high": int(hi.sum()),
+        "coverage_all": float(covered.mean()), "coverage_very_low": rate(covered, lo), "coverage_very_high": rate(covered, hi),
+        "mean_halfwidth": float(half.mean()),
+        "fixed_q": q_fixed, "fixed_coverage_all": float(fixed_cov.mean()), "fixed_coverage_very_low": rate(fixed_cov, lo),
+        "fixed_coverage_very_high": rate(fixed_cov, hi),
+    }
+
+
+def baseline_metrics(split: SplitData) -> dict:
+    """Naive reference predictors (no indicators used), fitted on the training portion only.
+
+    * ``train_mean``: every row gets the training-set mean Life Ladder.
+    * ``region_mean``: every row gets its WHR region's training-set mean (global mean if the region is unseen).
+    """
+    mu = float(split.train[TARGET].mean())
+    region_mu = split.train.groupby("region")[TARGET].mean()
+
+    def predict(d: pd.DataFrame, by_region: bool) -> np.ndarray:
+        return d["region"].map(region_mu).fillna(mu).to_numpy(dtype=float) if by_region else np.full(len(d), mu)
+
+    out = {}
+    for name, by_region in (("train_mean", False), ("region_mean", True)):
+        out[name] = {part: regression_metrics(d[TARGET], predict(d, by_region)) for part, d in (("val", split.val), ("test", split.test))}
+    return out
 
 
 def feature_ranges(frame: pd.DataFrame, features: list[str]) -> dict:
@@ -383,6 +442,7 @@ def run_training(
             pf["strategy"] = strategy
             prediction_frames.append(pf)
             step += 1
+        exp["baselines"] = baseline_metrics(split)
         results["experiments"][strategy] = exp
 
     # ---- best model: lowest validation RMSE on unseen countries (group), tie-break MAE
@@ -422,6 +482,8 @@ def run_training(
     bk, bparams = best["key"], group_params[best["key"]]
     progress(min(step / total_steps, 0.97), "Fitting adaptive intervals (core model)…")
     adaptive, difficulty = adaptive_interval(frame, features, bk, bparams, coverage)
+    if "group" in splits:
+        adaptive["holdout"] = adaptive_interval_holdout(splits["group"], features, bk, bparams, coverage)
     results["adaptive_interval"] = adaptive
     # Optional companion model with emotional-wellbeing inputs (positive / negative affect)
     affect_feats = feature_list("core_plus_affect") if "core_plus_affect" in FEATURE_SETS else None
@@ -515,9 +577,20 @@ def main() -> None:  # pragma: no cover
             print(f"  {r['name']:20s} val RMSE {r['val']['rmse']:.3f}  test RMSE {r['test']['rmse']:.3f}  test R² {r['test']['r2']:.3f}")
     b = res["best_model"]
     print(f"\nBest model: {b['name']} (group val RMSE {b['val']['rmse']:.3f}, test RMSE {b['test']['rmse']:.3f})")
-    print(f"Conformal 90% half-width: ±{res['conformal']['q_cv']:.3f}; empirical test coverage {res['conformal']['empirical_test_coverage_split']:.1%}")
+    cf = res["conformal"]
+    print(f"Split-conformal 90% half-width ±{cf['q_split']:.3f} (validation countries): coverage {cf['empirical_test_coverage_split']:.1%} on unseen test countries; "
+          f"production half-width ±{cf['q_cv']:.3f}")
     ai = res["adaptive_interval"]
-    print(f"Adaptive 90% interval: coverage {ai['coverage_all']:.1%} (very low scores {ai['coverage_very_low']:.0%} vs fixed {ai['fixed_coverage_very_low']:.0%}); half-width {ai['min_halfwidth']:.2f}–{ai['max_halfwidth']:.2f}")
+    print(f"Adaptive 90% interval (cross-conformal, all data): coverage {ai['coverage_all']:.1%} by construction (very low scores {ai['coverage_very_low']:.0%} vs fixed "
+          f"{ai['fixed_coverage_very_low']:.0%}); half-width {ai['min_halfwidth']:.2f}–{ai['max_halfwidth']:.2f}")
+    if "holdout" in ai:
+        h = ai["holdout"]
+        print(f"Adaptive interval held-out check ({h['countries_test']} unseen countries): coverage {h['coverage_all']:.1%}; very low scores "
+              f"{h['coverage_very_low']:.0%} vs fixed {h['fixed_coverage_very_low']:.0%} (n = {h['n_test_very_low']} rows)")
+    for s, exp in res["experiments"].items():
+        bl = exp.get("baselines", {})
+        if bl:
+            print(f"Naive baselines, {s} test RMSE: training mean {bl['train_mean']['test']['rmse']:.3f}, region mean {bl['region_mean']['test']['rmse']:.3f}")
     if "affect_model" in res:
         print(f"Companion model with emotional wellbeing: grouped OOF RMSE {res['affect_model']['oof_rmse']:.3f} vs core {ai['oof_rmse']:.3f}")
     print(f"Total time {res['training_seconds']} s")

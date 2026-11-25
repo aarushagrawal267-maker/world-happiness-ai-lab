@@ -22,10 +22,12 @@ from .config import FIGURES_DIR, INDICATORS, LABELS, ROOT_DIR, SHORT_LABELS, TAR
 from .data_acquisition import load_manifest  # noqa: E402
 from .data_loader import load_bundle  # noqa: E402
 from .eda import country_period_change, dataset_overview, distribution_stats, ranking_overview, region_summary  # noqa: E402
+from .evaluate import cluster_bootstrap_rmse  # noqa: E402
 from .explainability import permutation_importance_df, shap_explanation, shap_importance  # noqa: E402
 from .feature_engineering import engineer_panel  # noqa: E402
 from .insight_engine import generate_insights  # noqa: E402
 from .model_manager import load_model, load_results  # noqa: E402
+from .regression_models import MODEL_SPECS  # noqa: E402
 from .statistical_analysis import correlation_tests, country_level, group_comparison, ols_regression  # noqa: E402
 from .train import build_modeling_frame, make_splits  # noqa: E402
 
@@ -244,10 +246,14 @@ def generate_report() -> str:
     s0 = ct.iloc[0]
     w(f"- **Strongest correlate:** {LABELS[s0['feature']]} (r = {s0['pearson_r']:.2f}, n = {s0['n']}). The six WHR indicators jointly explain "
       f"R² = {ols['r2']:.2f} of the variance in Life Ladder in a pooled OLS regression (n = {ols['n']}).")
+    bl_g = exps["group"].get("baselines")
     w(f"- **Best model:** {best['name']}, selected on validation RMSE for unseen countries: test RMSE **{best['test']['rmse']:.3f}**, MAE {best['test']['mae']:.3f}, "
-      f"R² {best['test']['r2']:.3f} on {exps['group']['countries_test']} countries never seen in training.")
+      f"R² {best['test']['r2']:.3f} on {exps['group']['countries_test']} countries never seen in training"
+      + (f" (naive baselines: training mean {bl_g['train_mean']['test']['rmse']:.3f}, region mean {bl_g['region_mean']['test']['rmse']:.3f})." if bl_g else "."))
     w(f"- **Validation matters:** random K-fold CV understates error for new countries by {cvp['group_vs_random_%'].mean():.0f}% on average across models.")
-    w(f"- **Uncertainty:** split-conformal 90% intervals are ±{cf['q_cv']:.2f} ladder points; empirical coverage on unseen test countries {cf['empirical_test_coverage_split']:.1%}.")
+    w(f"- **Uncertainty:** a split-conformal 90% interval of ±{cf['q_split']:.2f} ladder points (calibrated on validation countries) covered "
+      f"{cf['empirical_test_coverage_split']:.1%} of rows from unseen test countries. The app recalibrates on all data (fixed width ±{cf['q_cv']:.2f}, "
+      "or the adaptive interval described in 6.5).")
     w(f"- **Clusters:** {cl.k} country profiles (silhouette {cl.silhouette:.2f}) — " + "; ".join(f"C{c + 1} {cl.names[c]}" for c in sorted(cl.names)) + ".\n")
 
     w("## 2. Data sources and preparation\n")
@@ -327,17 +333,41 @@ def generate_report() -> str:
         w(f"**{SNAME[s]}**\n")
         w(md_table(perf[perf["strategy"] == s].drop(columns="strategy").sort_values("val_rmse"), 4))
         w("")
+    bl_rows = [{"question": SNAME[s], "baseline": lbl, "val_rmse": e["baselines"][b_]["val"]["rmse"], "test_rmse": e["baselines"][b_]["test"]["rmse"],
+                "test_mae": e["baselines"][b_]["test"]["mae"], "test_r2": e["baselines"][b_]["test"]["r2"],
+                "best_model_test_rmse": e["models"][best["key"]]["test"]["rmse"]}
+               for s, e in exps.items() if "baselines" in e
+               for b_, lbl in (("train_mean", "Training mean"), ("region_mean", "Region mean (training rows)"))]
+    if bl_rows:
+        w("**Naive baselines** (no indicators used; fitted on the training rows of each split, scored on the same validation/test rows):\n")
+        w(md_table(pd.DataFrame(bl_rows), 4))
+        w("")
     w(f"![Models]({figs['models']})\n")
     w("### 6.3 Cross-validation strategy comparison (same model, same data)\n")
     w(md_table(cvp.reset_index(), 4))
     w(f"\n![CV]({figs['cv']})\n")
     w(f"### 6.4 Selected model\n\n**{best['name']}** — {best['selection_rule']} Tuned parameters: `{ {k: v for k, v in best['params'].items() if k not in ('random_state', 'n_jobs', 'verbosity')} }`.\n")
-    w("| Question | Test RMSE | Test MAE | Test R² |\n|---|---|---|---|")
+    boot = {}
+    for s in best_test:
+        ps = preds[preds["strategy"] == s]
+        wide = ps.pivot_table(index=["country", "year"], columns="model", values="predicted").join(ps.groupby(["country", "year"])["actual"].first()).reset_index()
+        cmp_keys = [k for k in [best["key"]] + [r["key"] for r in best["ranking"][1:2]] + ["ridge"] if k in wide]
+        cmp_keys = list(dict.fromkeys(cmp_keys))
+        boot[s] = cluster_bootstrap_rmse(wide["actual"], {k: wide[k] for k in cmp_keys}, wide["country"])
+    w("| Question | Test RMSE | 95% CI (country bootstrap) | Test MAE | Test R² |\n|---|---|---|---|---|")
     for s, m in best_test.items():
-        w(f"| {SNAME[s]} | {m['rmse']:.3f} | {m['mae']:.3f} | {m['r2']:.3f} |")
+        lo_, hi_ = boot[s]["rmse_ci"][best["key"]]
+        w(f"| {SNAME[s]} | {m['rmse']:.3f} | {lo_:.3f}–{hi_:.3f} | {m['mae']:.3f} | {m['r2']:.3f} |")
+    gb = boot.get("group")
+    if gb:
+        diffs = "; ".join(f"vs {MODEL_SPECS[pair.split(' - ')[1]].name} {lo_:+.3f} to {hi_:+.3f}"
+                          for pair, (lo_, hi_) in gb["diff_ci"].items() if pair.startswith(best["key"] + " - "))
+        w(f"\nIntervals come from resampling whole test countries ({gb['n_groups']} on the unseen-country split, {gb['n_boot']} resamples), because rows of one country are not "
+          f"independent. 95% interval of the RMSE difference on unseen countries ({best['name']} minus other): {diffs} ladder points; an interval that contains 0 means "
+          "this test set cannot tell the two models apart.")
     w(f"\nPrediction intervals: {cf['method']}; half-width ±{cf['q_split']:.3f} calibrated on {cf['n_calibration']} validation rows gives "
-      f"{cf['empirical_test_coverage_split']:.1%} coverage on {cf['n_test']} unseen test rows (target {cf['coverage_target']:.0%}). The production model uses ±{cf['q_cv']:.3f} "
-      f"from grouped 5-fold out-of-fold residuals (coverage {cf['empirical_oof_coverage_cv']:.1%}).\n")
+      f"{cf['empirical_test_coverage_split']:.1%} coverage on {cf['n_test']} unseen test rows (target {cf['coverage_target']:.0%}). The production fixed-width interval uses ±{cf['q_cv']:.3f}, "
+      "the 90% quantile of grouped 5-fold out-of-fold residuals on all data (its coverage on those same residuals is 90% by construction, so it is not a separate test).\n")
     w(f"![Actual vs predicted]({figs['avp']})\n")
     ai = res.get("adaptive_interval")
     if ai:
@@ -348,11 +378,20 @@ def generate_report() -> str:
             ex = ex.merge(pd.DataFrame(res["affect_model"]["extremes"])[["actual_band", "bias_actual_minus_pred", "rmse"]].rename(
                 columns={"bias_actual_minus_pred": "bias_with_affect", "rmse": "rmse_with_affect"}), on="actual_band")
         w(md_table(ex, 3))
-        w(f"\nLike any imperfect predictor, the model shrinks extremes. Recalibration and stacking were tested and gave little improvement; the remaining error comes from information "
-          f"the indicators do not contain (conflict, collapse). Two remedies are deployed: (1) a **normalised conformal interval** whose width follows a learned difficulty model "
-          f"(half-width ±{ai['min_halfwidth']:.2f} to ±{ai['max_halfwidth']:.2f}); coverage {ai['coverage_all']:.1%} overall and {ai['coverage_very_low']:.0%} for actual scores below 4 "
-          f"(fixed-width: {ai['fixed_coverage_very_low']:.0%}); (2) an optional companion model adding positive/negative affect"
-          + (f" (grouped RMSE {res['affect_model']['oof_rmse']:.3f} vs {ai['oof_rmse']:.3f})" if "affect_model" in res else "") + ".\n")
+        w(f"\nLike any imperfect predictor, the model shrinks extremes; much of the remaining error plausibly comes from information the indicators do not contain "
+          f"(conflict, collapse). Post-hoc fixes such as recalibration or stacking are not part of this pipeline. Two remedies are deployed: (1) a **normalised conformal interval** "
+          f"whose width follows a learned difficulty model (half-width ±{ai['min_halfwidth']:.2f} to ±{ai['max_halfwidth']:.2f}). On the out-of-fold rows used to calibrate it, "
+          f"overall coverage is {ai['coverage_all']:.1%} by construction, and {ai['coverage_very_low']:.0%} for actual scores below 4 (fixed-width: {ai['fixed_coverage_very_low']:.0%}); "
+          f"(2) an optional companion model adding positive/negative affect"
+          + (f" (grouped out-of-fold RMSE {res['affect_model']['oof_rmse']:.3f} vs {ai['oof_rmse']:.3f})" if "affect_model" in res else "") + ".\n")
+        h, coverage_target = ai.get("holdout"), ai["coverage_target"]
+        if h:
+            w(f"**Held-out check of the intervals.** Refitting the whole interval procedure on the train + validation countries only and scoring the {h['n_test']} rows of the "
+              f"{h['countries_test']} unseen test countries: adaptive coverage {h['coverage_all']:.1%} overall, {h['coverage_very_low']:.0%} for actual scores below 4 and "
+              f"{h['coverage_very_high']:.0%} for scores ≥ 7; fixed-width (±{h['fixed_q']:.2f}) {h['fixed_coverage_all']:.1%}, {h['fixed_coverage_very_low']:.0%} and "
+              f"{h['fixed_coverage_very_high']:.0%}. The test set holds only {h['n_test_very_low']} rows below 4 (from {h['countries_test_very_low']} countries) and "
+              f"{h['n_test_very_high']} rows ≥ 7, so the band-level figures are rough"
+              + ("; in both checks the intervals under-cover very unhappy country-years." if max(h["coverage_very_low"], ai["coverage_very_low"]) < coverage_target else ".") + "\n")
 
     w("## 7. Explainable AI\n")
     w(f"Measured for the evaluation {best['name']} on the unseen-country test set ({len(split.test)} rows):\n")
@@ -383,7 +422,10 @@ def generate_report() -> str:
       "- National means rest on ~1,000 respondents per country-year; small changes are within sampling error.\n"
       f"- The annual panel ends in {ov['year_max']}; WHR 2024–2026 rankings are included but provide explained-by contributions, not raw indicators.\n"
       "- Country coverage varies over time; some indicators (perceived corruption, healthy life expectancy) are missing for specific countries.\n"
-      "- Model-based what-if scenarios describe model behaviour, not the consequences of real-world interventions.\n")
+      "- Model-based what-if scenarios describe model behaviour, not the consequences of real-world interventions.\n"
+      "- Hyper-parameters tuned on the grouped split's training countries are reused in the all-data experiments (CV-scheme comparison, out-of-fold intervals), "
+      "so those figures are slightly optimistic for the countries the tuning saw.\n"
+      "- 90% intervals hold on average, not for every country: coverage is clearly lower for very low actual scores (see 6.5).\n")
     report = "\n".join(L)
     (ROOT_DIR / "PROJECT_REPORT.md").write_text(report, encoding="utf-8")
     return report
