@@ -251,8 +251,8 @@ In the app, **ML Training Lab** lets you pick a model, hyper-parameters, feature
 
 ## 17. Using Happiness Prediction
 Open **Happiness Prediction**, optionally load a real country's profile, edit the six indicators (inputs are validated against definitional
-limits and the training range; GDP is shown in dollars as well as logs) and press *Estimate*. You get the estimate, the model used, a
-90% split-conformal interval, extrapolation warnings (per input and for the combination via Mahalanobis distance), the most similar observed
+limits and the training range; GDP is shown in dollars as well as logs) and press *Estimate*. You get the estimate, the model used, an
+adaptive 90% conformal interval (for the two ★ recommended models; the other models give a point estimate only), extrapolation warnings (per input and for the combination via Mahalanobis distance), the most similar observed
 country-years, a contribution waterfall, global importance and the model's limitations.
 
 ## 18. Using the What-If Simulator
