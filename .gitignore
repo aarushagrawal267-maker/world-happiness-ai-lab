@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+env/
 .pytest_cache/
 .ipynb_checkpoints/
 
@@ -20,4 +21,20 @@ Thumbs.db
 
 # Secrets
 .env
+.env.*
+!.env.example
 .streamlit/secrets.toml
+kaggle.json
+*.pem
+*.key
+*.p12
+
+# Local databases and data dumps
+*.db
+*.sqlite
+*.sqlite3
+*.sql
+*.dump
+
+# Node (if any front-end tooling is added)
+node_modules/
