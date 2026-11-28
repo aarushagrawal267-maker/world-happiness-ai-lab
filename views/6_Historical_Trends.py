@@ -8,7 +8,7 @@ from src.config import INDICATORS, LABELS, REGIONS, TARGET
 from src.eda import country_period_change, trend_slopes, yoy_changes
 
 ui.page_header(
-    "Historical Trends",
+    "Historical trends",
     "How reported life evaluations have moved since 2005: global and regional trends, the biggest improvers and decliners, rank movements and year-over-year changes.",
     "Explore · Change over time",
 )

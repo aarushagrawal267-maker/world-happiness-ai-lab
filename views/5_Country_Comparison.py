@@ -17,7 +17,7 @@ from src.country_comparison import (
 )
 
 ui.page_header(
-    "Country Comparison",
+    "Country comparison",
     "Compare two to six countries side by side: percentile radar profiles, indicator-by-indicator bars, historical trends and data availability.",
     "Explore · Compare nations",
 )

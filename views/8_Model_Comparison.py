@@ -7,7 +7,7 @@ from src.evaluate import describe_validation
 from src.regression_models import MODEL_KEYS, MODEL_SPECS
 
 ui.page_header(
-    "Model Comparison",
+    "Model comparison",
     "Seven regression models, three validation questions, identical data and preprocessing. Models are compared on several metrics and "
     "validation schemes — never on R² alone.",
     "Machine learning · Compare",

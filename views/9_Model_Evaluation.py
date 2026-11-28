@@ -8,7 +8,7 @@ from src.evaluate import METRIC_INFO, error_by_group, error_by_score_range, regr
 from src.regression_models import MODEL_SPECS
 
 ui.page_header(
-    "Model Evaluation",
+    "Model evaluation",
     "Diagnostics on held-out test data: accuracy metrics, actual vs predicted, residual behaviour, and where the model errs — by region and by score range.",
     "Machine learning · Evaluate",
 )

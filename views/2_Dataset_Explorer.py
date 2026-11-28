@@ -8,7 +8,7 @@ from src.data_loader import ingest_upload
 from src.data_validation import DATASET_KINDS
 
 ui.page_header(
-    "Dataset Explorer",
+    "Dataset explorer",
     "Every file the platform uses: where it came from, how it was standardised, what validation found, and the data itself. "
     "Upload your own WHR edition (CSV or Excel) and it will be detected, validated and standardised automatically.",
     "Explore · Data acquisition & provenance",

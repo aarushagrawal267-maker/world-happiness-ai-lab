@@ -11,7 +11,7 @@ from src.feature_engineering import add_categories
 from src.statistical_analysis import correlation_tests, country_level, group_comparison, ols_regression
 
 ui.page_header(
-    "Statistical Analysis",
+    "Statistical analysis",
     "Formal tests of association: correlation tests with confidence intervals, multiple linear regression with assumption diagnostics "
     "and country-clustered standard errors, and group comparisons with multiple-comparison correction and effect sizes.",
     "Analyze · Inference",

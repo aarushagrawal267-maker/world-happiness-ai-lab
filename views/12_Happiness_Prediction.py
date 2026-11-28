@@ -9,7 +9,7 @@ from src.explainability import explain_instance
 from src.prediction import extreme_warning, input_specs, mahalanobis_extrapolation, nearest_profiles, predict_one, validate_inputs
 
 ui.page_header(
-    "Happiness Prediction",
+    "Happiness prediction",
     "Enter a country profile and the model estimates the national average life evaluation typical of historical country-years with similar indicators — "
     "with a calibrated 90% prediction interval and an explanation.",
     "Simulate · Predict",

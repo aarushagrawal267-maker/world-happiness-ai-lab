@@ -14,7 +14,7 @@ from src.regression_models import MODEL_SPECS, XGBOOST_AVAILABLE
 from src.train import run_training, train_single
 
 ui.page_header(
-    "Machine Learning Training Lab",
+    "Machine learning training lab",
     "Train and tune regression models that estimate a country's Life Ladder from its indicators. Choose the model, hyper-parameters, feature set and the "
     "validation question; watch progress; compare runs; save models for the prediction tools.",
     "Machine learning · Train",

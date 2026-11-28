@@ -4,7 +4,7 @@ from src import ui
 from src.insight_engine import generate_insights, insights_frame
 
 ui.page_header(
-    "Automated Insights",
+    "Automated insights",
     "Findings generated on the fly from the loaded data and the saved model results. Nothing here is hard-coded: change the data and the insights change. "
     "Every card states its source, reporting period and metric.",
     "Overview · Data-driven findings",

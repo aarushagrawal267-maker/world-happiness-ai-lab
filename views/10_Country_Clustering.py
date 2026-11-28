@@ -6,7 +6,7 @@ from src import visualization as viz
 from src.config import INDICATORS, LABELS, SHORT_LABELS, TARGET
 
 ui.page_header(
-    "Country Clustering",
+    "Country clustering",
     "Unsupervised learning groups countries by similarity in their six socio-economic indicators. K-means and Ward hierarchical clustering, "
     "evaluated with silhouette, Davies–Bouldin and within-cluster sum of squares, visualised in PCA space and on the map.",
     "Analyze · Unsupervised learning",

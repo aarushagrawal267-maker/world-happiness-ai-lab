@@ -17,7 +17,7 @@ from src.scenario_simulator import (
 )
 
 ui.page_header(
-    "What-If Happiness Simulator",
+    "What-if happiness simulator",
     "Adjust a country's indicators and see how the trained model's estimate changes. Save scenarios and compare them side by side.",
     "Simulate · Model-based hypothetical scenarios",
 )
@@ -172,5 +172,5 @@ if saved:
                                   f"Scenarios for baseline {same_base[-1].base_label}"), key="sc_cmp")
     st.download_button("Download scenarios (CSV)", tbl.to_csv(index=False).encode(), file_name="what_if_scenarios.csv", mime="text/csv")
 else:
-    st.caption("No saved scenarios yet. Adjust the sliders and press *Save scenario* to build a comparison.")
+    st.caption("No saved scenarios yet. Adjust the sliders and press Save scenario to build a comparison.")
 ui.footer()

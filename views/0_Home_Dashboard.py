@@ -48,7 +48,12 @@ with c2:
     ui.section("Top 10", "02", "highest reported life evaluations")
     if ro:
         top = latest.nsmallest(10, "rank")
-        ui.chart(viz.ranking_bars(top, "ladder_score", ci=("lower_whisker", "upper_whisker"), height=470), key="home_top")
+        fig = viz.ranking_bars(top, "ladder_score", ci=("lower_whisker", "upper_whisker"), height=470)
+        # thin ruled bars on the full 0–10 ladder scale
+        fig.update_traces(width=0.28, marker_cornerradius=2)
+        fig.update_xaxes(range=[0, 10], dtick=2, title="Ladder score / 10")
+        fig.update_layout(margin=dict(r=40))
+        ui.chart(fig, key="home_top")
 
 if res:
     ui.section("Model performance at a glance", "03", "same data, three different questions — accuracy depends on what you ask")
@@ -71,12 +76,12 @@ if res:
 
 ui.section("Launch a tool", "04")
 tiles = [
-    ("views/1_Global_Happiness_Explorer.py", "Global Explorer", "Interactive world map of every indicator, year and region."),
-    ("views/12_Happiness_Prediction.py", "Happiness Prediction", "Estimate a life-evaluation score from six indicators with an interval."),
-    ("views/13_What_If_Simulator.py", "What-If Simulator", "Model-based hypothetical scenarios with saved comparisons."),
-    ("views/5_Country_Comparison.py", "Compare Countries", "Radar profiles, trends and side-by-side statistics."),
+    ("views/1_Global_Happiness_Explorer.py", "Global explorer", "Interactive world map of every indicator, year and region."),
+    ("views/12_Happiness_Prediction.py", "Happiness prediction", "Estimate a life-evaluation score from six indicators with an interval."),
+    ("views/13_What_If_Simulator.py", "What-if simulator", "Model-based hypothetical scenarios with saved comparisons."),
+    ("views/5_Country_Comparison.py", "Compare countries", "Radar profiles, trends and side-by-side statistics."),
     ("views/11_Explainable_AI.py", "Explainable AI", "SHAP, permutation importance and partial dependence."),
-    ("views/14_Automated_Insights.py", "Automated Insights", "Findings generated live from the data, with sources."),
+    ("views/14_Automated_Insights.py", "Automated insights", "Findings generated live from the data, with sources."),
 ]
 cols = st.columns(3)
 for i, (page, t, d) in enumerate(tiles):

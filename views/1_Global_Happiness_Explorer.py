@@ -7,7 +7,7 @@ from src.config import INDICATORS, LABELS, REGIONS, SHORT_LABELS, TARGET
 from src.geography import load_country_reference
 
 ui.page_header(
-    "Global Happiness Explorer",
+    "Global happiness explorer",
     "Explore every indicator on an interactive world map. Hover for statistics, click countries to inspect and compare them, "
     "filter by region, and see exactly which countries have no data.",
     "Explore · Interactive world map",
@@ -67,7 +67,7 @@ missing = sorted(set(universe["country"]) - have)
 ui.stat_row([
     ("Countries with data", f"{len(have)}"),
     ("No data for this view", f"{len(missing)}"),
-    ("Mean", f"{d[col].mean():.3f}" if col not in ("cluster_name",) else "—"),
+    ("Mean", (ui.score(d[col].mean(), ".3f") if col in ("ladder_score", "life_ladder") else f"{d[col].mean():.3f}") if col not in ("cluster_name",) else "—"),
     ("Min → max", f"{d[col].min():.2f} → {d[col].max():.2f}" if col not in ("cluster_name",) else f"{d[col].nunique()} clusters"),
     ("Source", f"<span style='font-size:.8rem'>{src_txt}</span>"),
 ])
@@ -138,7 +138,7 @@ if sel:
                 ui.chart(viz.sparkline(r_hist["ladder_score"].tolist(), height=70), key=f"spark_{c}")
                 st.caption(f"Official ladder score {int(r_hist['year'].min())}–{int(r_hist['year'].max())}")
     if len(sel) >= 2:
-        ui.section("Quick comparison", "⇄")
+        ui.section("Quick comparison")
         y_cmp = int(rk["year"].max())
         cmp = rk[(rk["country"].isin(sel)) & (rk["year"] == y_cmp)][["country", "rank", "ladder_score", "lower_whisker", "upper_whisker", "region"]]
         not_ranked = sorted(set(sel) - set(cmp["country"]))

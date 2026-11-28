@@ -17,7 +17,7 @@ from .config import CFG, PALETTE
 # --------------------------------------------------------------------------- CSS
 _CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* Graphite ramp, one daylight-blue accent. Chart colours live in visualization.py. */
 :root {
@@ -74,10 +74,10 @@ section[data-testid="stSidebar"] [data-testid="stNavSectionHeader"] { font-famil
 .page-head p { margin: 0; color: var(--text-2); max-width: 900px; font-size: 1rem; }
 
 /* ---------- cards ---------- */
-.kpi-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(136px, 1fr)); gap: 12px; margin: 8px 0 24px 0; }
+.kpi-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: 12px; margin: 8px 0 24px 0; }
 .kpi { padding: 20px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); }
 .kpi .label { font-size: .8125rem; color: var(--text-2); }
-.kpi .value { font-size: 1.875rem; font-weight: 500; color: var(--text); line-height: 1.15; margin-top: 8px; font-variant-numeric: tabular-nums; }
+.kpi .value { font-size: 1.75rem; font-weight: 500; color: var(--text); line-height: 1.15; margin-top: 8px; font-variant-numeric: tabular-nums; }
 .kpi .value.long { font-size: 1.25rem; padding-top: 8px; }
 .kpi .value small { font-family: var(--mono); font-size: .8125rem; color: var(--muted); font-weight: 400; margin-left: 4px; }
 .kpi .sub { font-size: .8125rem; color: var(--muted); margin-top: 4px; }
@@ -119,8 +119,7 @@ section[data-testid="stSidebar"] [data-testid="stNavSectionHeader"] { font-famil
 .big-number { font-weight: 500; font-size: 3.5rem; line-height: 1; letter-spacing: -0.02em; color: var(--text); font-variant-numeric: tabular-nums; }
 
 .tag { display:inline-block; font-size: .75rem; padding: 2px 8px; border-radius: 4px; margin: 2px 4px 2px 0; border: 1px solid var(--border); color: var(--text-2); background: var(--surface-2); }
-.tag.blue { color: var(--primary); }
-.tag.green { color: var(--positive); }
+.tag.blue, .tag.green { color: var(--text-2); }
 .tag.orange { color: var(--caution); }
 .tag.red { color: #f07a7e; }
 
@@ -231,7 +230,7 @@ def kpi_cards(items: list[dict]) -> None:
     for it in items:
         cells.append(
             f"""<div class="kpi"><div class="label">{esc(it['label'])}</div>
-            <div class="value{' long' if len(str(it['value'])) > 9 and '<' not in str(it['value']) else ''}">{it['value']}</div><div class="sub">{it.get('sub', '')}</div></div>"""
+            <div class="value{' long' if len(str(it['value'])) > 7 and '<' not in str(it['value']) else ''}">{it['value']}</div><div class="sub">{it.get('sub', '')}</div></div>"""
         )
     st.markdown(f"<div class='kpi-grid'>{''.join(cells)}</div>", unsafe_allow_html=True)
 

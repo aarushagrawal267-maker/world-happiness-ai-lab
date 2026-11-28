@@ -18,7 +18,7 @@ from src.preprocessing import missing_summary, outlier_analysis, outlier_summary
 from src.statistical_analysis import pairwise_correlation_pvalues
 
 ui.page_header(
-    "Exploratory Data Analysis",
+    "Exploratory data analysis",
     "Distributions, rankings, economic and social relationships, correlations and missing data — computed live from the annual "
     "WHR country-year panel and the official ranking tables.",
     "Explore · EDA",
