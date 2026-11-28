@@ -22,7 +22,7 @@ ui.page_header(
     "Simulate · Model-based hypothetical scenarios",
 )
 st.markdown(
-    "<div class='callout warn'><span class='ci'>⚗</span><div><b>Model-based hypothetical scenario simulator.</b> Results show how the model's estimate responds "
+    "<div class='callout warn'><span class='ci'></span><div><b>Model-based hypothetical scenario simulator.</b> Results show how the model's estimate responds "
     "when inputs change, based on patterns across countries in historical data. Moving a slider is <b>not</b> a real-world causal intervention: it does not "
     "predict what would happen if a country changed a policy, and it guarantees nothing. Changes that leave the range of observed data are flagged as extrapolation.</div></div>",
     unsafe_allow_html=True,
@@ -119,10 +119,9 @@ with c1:
     ui.chart(viz.gauge(sc.modified_prediction, title="Scenario estimate (Life Ladder)", reference=sc.base_prediction if abs(sc.delta) >= 0.005 else None), key="wi_gauge")
 with c2:
     ui.kpi_cards([
-        {"label": "Original prediction", "value": f"{sc.base_prediction:.2f}", "sub": base_label, "icon": "○"},
-        {"label": "Scenario prediction", "value": f"{sc.modified_prediction:.2f}", "sub": "modified inputs", "icon": "●"},
-        {"label": "Difference", "value": f"{(0.0 if abs(sc.delta) < 0.005 else sc.delta):+.2f}", "sub": "ladder points", "icon": "Δ",
-         "accent": "linear-gradient(90deg,#4FE3C1,#9BE57A)" if sc.delta >= 0 else "linear-gradient(90deg,#FF6B8B,#FFB86B)"},
+        {"label": "Original prediction", "value": ui.score(sc.base_prediction), "sub": base_label},
+        {"label": "Scenario prediction", "value": ui.score(sc.modified_prediction), "sub": "modified inputs"},
+        {"label": "Difference", "value": f"{(0.0 if abs(sc.delta) < 0.005 else sc.delta):+.2f}", "sub": "ladder points"},
     ])
     rmse = res["best_model"]["test"]["rmse"]
     if abs(sc.delta) < 0.1:
@@ -155,7 +154,7 @@ with c1:
 with c2:
     st.write("")
     st.write("")
-    if st.button("💾 Save scenario", type="primary"):
+    if st.button("Save scenario", type="primary"):
         s2 = simulate(pipe, feats, base, mod, specs, name=sname, base_label=base_label, model_name=model_name)
         saved.append(s2)
         st.rerun()

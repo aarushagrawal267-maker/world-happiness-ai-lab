@@ -28,12 +28,12 @@ cl = ui.clustering(None if auto else k_manual, tuple(sorted(yrs)))
 p = cl.profiles
 
 ui.kpi_cards([
-    {"label": "Clusters (k)", "value": str(cl.k), "sub": "data-driven" if auto else "manual", "icon": "⬡"},
-    {"label": "Countries", "value": str(cl.info["n_countries"]), "sub": f"{len(cl.info['excluded'])} excluded (incomplete)", "icon": "◍"},
-    {"label": "Silhouette", "value": f"{cl.silhouette:.3f}", "sub": "−1…1, higher = better separated", "icon": "◐"},
-    {"label": "Davies–Bouldin", "value": f"{cl.davies_bouldin:.3f}", "sub": "lower = more compact/separate", "icon": "◑"},
-    {"label": "K-means vs Ward", "value": f"{cl.hierarchical_ari:.2f}", "sub": "adjusted Rand agreement", "icon": "≈"},
-    {"label": "PCA: PC1 + PC2", "value": f"{(cl.pca_variance[0] + cl.pca_variance[1]):.0%}", "sub": "variance shown in 2-D", "icon": "◫"},
+    {"label": "Clusters (k)", "value": str(cl.k), "sub": "data-driven" if auto else "manual"},
+    {"label": "Countries", "value": str(cl.info["n_countries"]), "sub": f"{len(cl.info['excluded'])} excluded (incomplete)"},
+    {"label": "Silhouette", "value": f"{cl.silhouette:.3f}", "sub": "−1…1, higher = better separated"},
+    {"label": "Davies–Bouldin", "value": f"{cl.davies_bouldin:.3f}", "sub": "lower = more compact/separate"},
+    {"label": "K-means vs Ward", "value": f"{cl.hierarchical_ari:.2f}", "sub": "adjusted Rand agreement"},
+    {"label": "PCA: PC1 + PC2", "value": f"{(cl.pca_variance[0] + cl.pca_variance[1]):.0%}", "sub": "variance shown in 2-D"},
 ])
 
 ui.section("Choosing the number of clusters", "01")
@@ -82,6 +82,6 @@ if cl.info["excluded"]:
 if cl.info["filled_from_own_history"]:
     st.caption("Gaps filled from the same country's most recent earlier observation: " + "; ".join(f"{k}: {', '.join(v)}" for k, v in cl.info["filled_from_own_history"].items()))
 ui.callout("Clusters summarise similarity in six chosen indicators; with a silhouette around 0.3 they overlap substantially. They are a descriptive lens, "
-           "<b>not objective categories of national happiness</b>, and would change with other indicators, years or scaling choices.", "warn", "⚖")
+           "<b>not objective categories of national happiness</b>, and would change with other indicators, years or scaling choices.", "warn")
 ui.footer()
 _ = LABELS

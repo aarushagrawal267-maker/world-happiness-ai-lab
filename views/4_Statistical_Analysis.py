@@ -57,11 +57,11 @@ with t2:
     else:
         r = ols_regression(panel[panel["year"].between(*yr2)], TARGET, feats, standardize=stdz)
         ui.kpi_cards([
-            {"label": "R²", "value": f"{r['r2']:.3f}", "sub": "share of variance explained", "icon": "◔"},
-            {"label": "Adjusted R²", "value": f"{r['adj_r2']:.3f}", "sub": f"{len(feats)} predictors", "icon": "◑"},
-            {"label": "F-statistic", "value": f"{r['f_stat']:.0f}", "sub": f"p = {r['f_pvalue']:.1e}", "icon": "F"},
-            {"label": "Observations", "value": f"{r['n']:,}", "sub": f"{r['n_countries']} countries (complete cases)", "icon": "▦"},
-            {"label": "AIC / BIC", "value": f"{r['aic']:.0f}", "sub": f"BIC {r['bic']:.0f}", "icon": "≡"},
+            {"label": "R²", "value": f"{r['r2']:.3f}", "sub": "share of variance explained"},
+            {"label": "Adjusted R²", "value": f"{r['adj_r2']:.3f}", "sub": f"{len(feats)} predictors"},
+            {"label": "F-statistic", "value": f"{r['f_stat']:.0f}", "sub": f"p = {r['f_pvalue']:.1e}"},
+            {"label": "Observations", "value": f"{r['n']:,}", "sub": f"{r['n_countries']} countries (complete cases)"},
+            {"label": "AIC / BIC", "value": f"{r['aic']:.0f}", "sub": f"BIC {r['bic']:.0f}"},
         ])
         tbl = r["table"].copy()
         tbl["term"] = tbl["term"].map(lambda t: LABELS.get(t, t))
@@ -125,12 +125,11 @@ with t3:
     else:
         gc = group_comparison(cl, value, gcol)
         ui.kpi_cards([
-            {"label": "One-way ANOVA", "value": f"F = {gc['anova_f']:.1f}", "sub": f"p = {gc['anova_p']:.2e}", "icon": "F"},
-            {"label": "Welch ANOVA", "value": f"F = {gc['welch_f']:.1f}", "sub": f"p = {gc['welch_p']:.2e} (unequal variances)", "icon": "W"},
-            {"label": "Kruskal–Wallis", "value": f"H = {gc['kruskal_h']:.1f}", "sub": f"p = {gc['kruskal_p']:.2e} (rank-based)", "icon": "H"},
-            {"label": "Effect size η²", "value": f"{gc['eta_squared']:.2f}", "sub": f"ω² = {gc['omega_squared']:.2f} · ε² = {gc['epsilon_squared']:.2f}", "icon": "η",
-             "accent": "linear-gradient(90deg,#B18CFF,#7C9CFF)"},
-            {"label": "Countries", "value": str(gc["n"]), "sub": f"{gc['k_groups']} groups", "icon": "◍"},
+            {"label": "One-way ANOVA", "value": f"F = {gc['anova_f']:.1f}", "sub": f"p = {gc['anova_p']:.2e}"},
+            {"label": "Welch ANOVA", "value": f"F = {gc['welch_f']:.1f}", "sub": f"p = {gc['welch_p']:.2e} (unequal variances)"},
+            {"label": "Kruskal–Wallis", "value": f"H = {gc['kruskal_h']:.1f}", "sub": f"p = {gc['kruskal_p']:.2e} (rank-based)"},
+            {"label": "Effect size η²", "value": f"{gc['eta_squared']:.2f}", "sub": f"ω² = {gc['omega_squared']:.2f} · ε² = {gc['epsilon_squared']:.2f}"},
+            {"label": "Countries", "value": str(gc["n"]), "sub": f"{gc['k_groups']} groups"},
         ])
         ui.callout(f"<b>Recommended test:</b> {gc['recommended_test']} — Levene p = {gc['levene_p']:.3g}. <b>Practical significance:</b> {gc['practical_interpretation']}", "info")
         ui.chart(viz.box_by(cl, value, gcol, f"{LABELS[value]} by {g_label.lower()} — country means {yr3[0]}–{yr3[1]}"), key="grpbox")

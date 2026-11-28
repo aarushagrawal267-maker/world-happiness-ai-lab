@@ -6,7 +6,7 @@ import streamlit as st
 
 st.set_page_config(
     page_title="World Happiness AI Lab",
-    page_icon="🌍",
+    page_icon=":material/public:",
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={"About": "World Happiness AI Lab — understanding and predicting global happiness with World Happiness Report data."},

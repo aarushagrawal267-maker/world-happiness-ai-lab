@@ -111,7 +111,7 @@ if clicked and tuple(clicked) != st.session_state.get("explorer_last_click"):
 sel = st.multiselect("Selected countries (click the map or choose here)", all_countries, max_selections=6, key="explorer_ms")
 
 if sel:
-    ui.section("Country details", "◉", "latest available observations — missing values are shown as n/a, never estimated")
+    ui.section("Country details", "", "latest available observations — missing values are shown as n/a, never estimated")
     cols = st.columns(min(len(sel), 3))
     for i, c in enumerate(sel):
         with cols[i % len(cols)]:
@@ -125,10 +125,10 @@ if sel:
                     v = last_p[f]
                     rows.append(f"<tr><td style='color:var(--muted);padding:2px 10px 2px 0'>{SHORT_LABELS[f]}</td><td style='text-align:right;color:var(--text)'>{'n/a' if pd.isna(v) else f'{v:.3f}'}</td></tr>")
             region = (last_r["region"] if last_r is not None else last_p["region"]) if (last_r is not None or last_p is not None) else "—"
-            head = (f"<div class='big-number' style='font-size:2.6rem'>{last_r['ladder_score']:.2f}</div><div style='color:var(--muted);font-size:.8rem'>Rank {int(last_r['rank'])} · WHR {int(last_r['year']) + 1}</div>"
+            head = (f"<div class='big-number' style='font-size:2.5rem'>{ui.score(last_r['ladder_score'])}</div><div style='color:var(--muted);font-size:.8rem'>Rank {int(last_r['rank'])} · WHR {int(last_r['year']) + 1}</div>"
                     if last_r is not None else "<div style='color:var(--muted)'>Not in official rankings</div>")
             st.markdown(
-                f"<div class='card glow'><div style='display:flex;justify-content:space-between;align-items:flex-start'><div><h4>{ui.esc(c)}</h4>"
+                f"<div class='card'><div style='display:flex;justify-content:space-between;align-items:flex-start'><div><h4>{ui.esc(c)}</h4>"
                 f"<div style='font-size:.78rem;color:var(--muted)'>{ui.esc(region)}</div></div><div style='text-align:right'>{head}</div></div>"
                 f"<div style='margin-top:10px;font-size:.78rem;color:var(--muted)'>Annual panel {int(last_p['year']) if last_p is not None else ''} · Life Ladder "
                 f"{'n/a' if last_p is None else f'{last_p[TARGET]:.2f}'}</div><table style='width:100%;font-size:.84rem;margin-top:6px'>{''.join(rows)}</table></div>",

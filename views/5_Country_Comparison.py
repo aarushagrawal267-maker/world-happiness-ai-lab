@@ -59,8 +59,8 @@ for col, (_, r) in zip(cols, tbl.iterrows()):
             for f in INDICATORS
         )
         st.markdown(
-            f"<div class='card' style='border-top:3px solid {cmap[r['country']]}'><h4>{ui.esc(r['country'])}</h4><div style='font-size:.74rem;color:var(--muted)'>{rank_txt}</div>"
-            f"<div class='big-number' style='font-size:2.4rem;margin:8px 0'>{'n/a' if np.isnan(r[TARGET]) else f'{r[TARGET]:.2f}'}</div>"
+            f"<div class='card' style='border-top:2px solid {cmap[r['country']]}'><h4>{ui.esc(r['country'])}</h4><div style='font-size:.74rem;color:var(--muted)'>{rank_txt}</div>"
+            f"<div class='big-number' style='font-size:2.4rem;margin:8px 0'>{'n/a' if np.isnan(r[TARGET]) else ui.score(r[TARGET])}</div>"
             f"<div style='font-size:.72rem;color:var(--muted);margin-bottom:6px'>Life Ladder {year}</div><table style='width:100%'>{rows}</table></div>",
             unsafe_allow_html=True,
         )

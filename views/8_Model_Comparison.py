@@ -27,7 +27,7 @@ order = [MODEL_SPECS[k].name for k in MODEL_KEYS if k in set(df["key"])]
 
 b = res["best_model"]
 ui.callout(f"<b>Selected model: {b['name']}.</b> {b['selection_rule']} Validation RMSE {b['val']['rmse']:.3f} · test RMSE {b['test']['rmse']:.3f} · "
-           f"test MAE {b['test']['mae']:.3f} · test R² {b['test']['r2']:.3f}.", "ok", "◎")
+           f"test MAE {b['test']['mae']:.3f} · test R² {b['test']['r2']:.3f}.", "ok")
 
 ui.section("Leaderboard", "01")
 s = st.segmented_control("Validation question", list(SNAME), default="group", format_func=lambda x: SNAME[x])

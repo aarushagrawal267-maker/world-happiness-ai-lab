@@ -21,10 +21,10 @@ tab_inv, tab_browse, tab_val, tab_up, tab_src = st.tabs(["Inventory", "Browse da
 with tab_inv:
     inv = b.inventory()
     ui.kpi_cards([
-        {"label": "Files detected", "value": str(len(inv)), "sub": "CSV / Excel under data/raw", "icon": "🗂"},
-        {"label": "Valid files", "value": str(int(inv["valid"].sum())), "sub": "passed all error-level checks", "icon": "✓"},
-        {"label": "Editions", "value": f"{len(b.editions) + (b.rankings['year'].nunique() if not b.rankings.empty else 0)}", "sub": "edition tables + ranking years", "icon": "◷"},
-        {"label": "Panel rows", "value": f"{len(b.panel):,}", "sub": b.panel_source, "icon": "▦"},
+        {"label": "Files detected", "value": str(len(inv)), "sub": "CSV / Excel under data/raw"},
+        {"label": "Valid files", "value": str(int(inv["valid"].sum())), "sub": "passed all error-level checks"},
+        {"label": "Editions", "value": f"{len(b.editions) + (b.rankings['year'].nunique() if not b.rankings.empty else 0)}", "sub": "edition tables + ranking years"},
+        {"label": "Panel rows", "value": f"{len(b.panel):,}", "sub": b.panel_source},
     ])
     st.dataframe(inv, hide_index=True, height=480, column_config={"valid": st.column_config.CheckboxColumn("valid")})
     st.caption("Structure is detected from the columns, not the file name: " + "; ".join(f"**{k}** = {v}" for k, v in DATASET_KINDS.items() if k != "unknown"))
@@ -72,11 +72,10 @@ with tab_val:
     lf = next(f for f in b.files if f.name == fname)
     rep = lf.report
     ui.kpi_cards([
-        {"label": "Detected structure", "value": rep.kind.replace("_", " "), "sub": DATASET_KINDS.get(rep.kind, ""), "icon": "◇"},
-        {"label": "Rows · columns", "value": f"{rep.n_rows} · {rep.n_columns}", "icon": "▦"},
-        {"label": "Countries", "value": str(rep.n_countries), "icon": "◍"},
-        {"label": "Duplicate keys", "value": str(rep.duplicate_country_year), "icon": "⧉",
-         "accent": "linear-gradient(90deg,#4FE3C1,#9BE57A)" if rep.duplicate_country_year == 0 else "linear-gradient(90deg,#FF6B8B,#FFB86B)"},
+        {"label": "Detected structure", "value": rep.kind.replace("_", " "), "sub": DATASET_KINDS.get(rep.kind, "")},
+        {"label": "Rows · columns", "value": f"{rep.n_rows} · {rep.n_columns}"},
+        {"label": "Countries", "value": str(rep.n_countries)},
+        {"label": "Duplicate keys", "value": str(rep.duplicate_country_year)},
     ])
     for i in rep.issues:
         ui.callout(f"<b>{i.check}</b> — {i.message}", {"error": "danger", "warning": "warn", "info": "ok"}[i.level])

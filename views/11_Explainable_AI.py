@@ -14,13 +14,13 @@ ui.page_header(
     "Machine learning · Explain",
 )
 ui.callout("<b>Feature importance is model-dependent and is not causal.</b> It shows what a particular fitted model uses to reproduce patterns in historical data. "
-           "Correlated indicators (income, health, social support) share and trade importance between them, and a different model can rank them differently.", "warn", "⚖")
+           "Correlated indicators (income, health, social support) share and trade importance between them, and a different model can rank them differently.", "warn")
 
 res = ui.ensure_trained()
 reg = ui.registry()
 b = ui.bundle()
 keys = list(res["experiments"]["group"]["models"])
-k = st.selectbox("Model to explain", keys, index=keys.index(res["best_model"]["key"]), format_func=lambda x: MODEL_SPECS[x].name + (" ★ best" if x == res["best_model"]["key"] else ""))
+k = st.selectbox("Model to explain", keys, index=keys.index(res["best_model"]["key"]), format_func=lambda x: MODEL_SPECS[x].name + (" · best" if x == res["best_model"]["key"] else ""))
 eval_name = f"eval_group_{k}"
 pipe = ui.model(eval_name)
 feats = reg[eval_name]["features"]
@@ -95,11 +95,10 @@ with t4:
     err = actual - ex["prediction"]
     in_train = (country not in test_c and country not in set(split.val["country"])) or use_prod
     ui.kpi_cards([
-        {"label": "Actual Life Ladder", "value": f"{actual:.2f}", "sub": f"{country} {year}", "icon": "●"},
-        {"label": "Predicted", "value": f"{ex['prediction']:.2f}", "sub": MODEL_SPECS[k].name, "icon": "◎"},
-        {"label": "Prediction error", "value": f"{err:+.2f}", "sub": "actual − predicted", "icon": "±",
-         "accent": "linear-gradient(90deg,#4FE3C1,#9BE57A)" if abs(err) < 0.5 else "linear-gradient(90deg,#FF6B8B,#FFB86B)"},
-        {"label": "Country seen in training?", "value": "yes" if in_train else "no", "sub": "errors are optimistic if yes" if in_train else "honest out-of-sample error", "icon": "?"},
+        {"label": "Actual Life Ladder", "value": ui.score(actual), "sub": f"{country} {year}"},
+        {"label": "Predicted", "value": ui.score(ex['prediction']), "sub": MODEL_SPECS[k].name},
+        {"label": "Prediction error", "value": f"{err:+.2f}", "sub": "actual − predicted"},
+        {"label": "Country seen in training?", "value": "yes" if in_train else "no", "sub": "errors are optimistic if yes" if in_train else "honest out-of-sample error"},
     ])
     c1, c2 = st.columns([1.3, 1])
     with c1:
