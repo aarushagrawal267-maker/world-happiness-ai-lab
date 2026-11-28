@@ -155,17 +155,19 @@ REGIONS = [
 # --------------------------------------------------------------------------- design tokens
 @dataclass(frozen=True)
 class Palette:
-    bg: str = "#070B1A"
-    surface: str = "#0E1430"
-    surface_2: str = "#141B3D"
-    border: str = "rgba(140,160,255,0.16)"
-    text: str = "#E8ECFF"
-    muted: str = "#8E98C8"
-    primary: str = "#7C9CFF"
-    accent: str = "#4FE3C1"
-    warm: str = "#FFB86B"
-    danger: str = "#FF6B8B"
-    violet: str = "#B18CFF"
+    """UI tokens: a graphite ramp with one daylight-blue accent (mirrors src/ui.py).
+    Chart data colours are the validated SERIES_COLORS / scales below."""
+    bg: str = "#141415"
+    surface: str = "#19191b"
+    surface_2: str = "#232325"
+    border: str = "rgba(237,237,237,0.08)"
+    text: str = "#ededed"
+    muted: str = "#85858b"
+    primary: str = "#6da7ec"
+    accent: str = "#6da7ec"
+    warm: str = "#d4a24c"
+    danger: str = "#e5484d"
+    violet: str = "#9085e9"
 
 
 PALETTE = Palette()
