@@ -18,7 +18,7 @@ from src.preprocessing import missing_summary, outlier_analysis, outlier_summary
 from src.statistical_analysis import pairwise_correlation_pvalues
 
 ui.page_header(
-    "Exploratory Data Analysis",
+    "Exploratory data analysis",
     "Distributions, rankings, economic and social relationships, correlations and missing data — computed live from the annual "
     "WHR country-year panel and the official ranking tables.",
     "Explore · EDA",
@@ -33,15 +33,15 @@ tabs = st.tabs(["A · Overview", "B · Distribution", "C · Countries", "D · Ec
 # ------------------------------------------------------------------ A
 with tabs[0]:
     ui.kpi_cards([
-        {"label": "Observations", "value": f"{ov['observations']:,}", "sub": "country-years", "icon": "▦"},
-        {"label": "Countries", "value": str(ov["countries"]), "icon": "◍"},
-        {"label": "Years", "value": str(ov["years"]), "sub": f"{ov['year_min']}–{ov['year_max']}", "icon": "◷"},
-        {"label": "Features", "value": str(ov["features"]), "sub": "explanatory indicators", "icon": "◇"},
-        {"label": "Mean Life Ladder", "value": f"{ov['mean_score']:.2f}", "sub": f"median {ov['median_score']:.2f} · SD {ov['std_score']:.2f}", "icon": "≈"},
-        {"label": "Highest", "value": f"{ov['max_score']:.2f}", "sub": f"{ov['max_country']} {ov['max_year']}", "icon": "▲", "accent": "linear-gradient(90deg,#4FE3C1,#9BE57A)"},
-        {"label": "Lowest", "value": f"{ov['min_score']:.2f}", "sub": f"{ov['min_country']} {ov['min_year']}", "icon": "▼", "accent": "linear-gradient(90deg,#FF6B8B,#FFB86B)"},
-        {"label": "Missing cells", "value": f"{ov['missing_cells']:,}", "sub": f"{ov['missing_pct']:.1f}% of indicator cells", "icon": "◌"},
-        {"label": "Duplicates", "value": str(ov["duplicate_country_years"]), "sub": "country-year keys", "icon": "⧉"},
+        {"label": "Observations", "value": f"{ov['observations']:,}", "sub": "country-years"},
+        {"label": "Countries", "value": str(ov["countries"])},
+        {"label": "Years", "value": str(ov["years"]), "sub": f"{ov['year_min']}–{ov['year_max']}"},
+        {"label": "Features", "value": str(ov["features"]), "sub": "explanatory indicators"},
+        {"label": "Mean Life Ladder", "value": ui.score(ov['mean_score']), "sub": f"median {ov['median_score']:.2f} · SD {ov['std_score']:.2f}"},
+        {"label": "Highest", "value": ui.score(ov['max_score']), "sub": f"{ov['max_country']} {ov['max_year']}"},
+        {"label": "Lowest", "value": ui.score(ov['min_score']), "sub": f"{ov['min_country']} {ov['min_year']}"},
+        {"label": "Missing cells", "value": f"{ov['missing_cells']:,}", "sub": f"{ov['missing_pct']:.1f}% of indicator cells"},
+        {"label": "Duplicates", "value": str(ov["duplicate_country_years"]), "sub": "country-year keys"},
     ])
     cov = coverage_by_year(panel)
     c1, c2 = st.columns(2)

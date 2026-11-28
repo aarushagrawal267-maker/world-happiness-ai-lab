@@ -14,7 +14,7 @@ from src.regression_models import MODEL_SPECS, XGBOOST_AVAILABLE
 from src.train import run_training, train_single
 
 ui.page_header(
-    "Machine Learning Training Lab",
+    "Machine learning training lab",
     "Train and tune regression models that estimate a country's Life Ladder from its indicators. Choose the model, hyper-parameters, feature set and the "
     "validation question; watch progress; compare runs; save models for the prediction tools.",
     "Machine learning · Train",
@@ -59,7 +59,7 @@ with tab_single:
                     params[p] = st.selectbox(p, cfg["options"], index=cfg["options"].index(cfg["default"]), key=f"{key}_{p}")
     n_iter = st.slider("Search iterations", 5, 40, 12) if tune else 0
     save_name = st.text_input("Save as (optional, letters/numbers/_)", value="", placeholder="e.g. my_forest")
-    if st.button("🚀  Train model", type="primary"):
+    if st.button("Train model", type="primary"):
         with st.status(f"Training {spec.name}…", expanded=True) as status:
             st.write(f"Splitting data for the **{strategy}** question…")
             t0 = time.perf_counter()
@@ -79,11 +79,10 @@ with tab_single:
     if out:
         ui.section("Result", "", f"{out['name']} · {out['feature_set']} · {out['strategy']} split")
         ui.kpi_cards([
-            {"label": "Train RMSE", "value": f"{out['train']['rmse']:.3f}", "sub": f"R² {out['train']['r2']:.3f}", "icon": "T"},
-            {"label": "CV RMSE", "value": f"{out['cv_rmse_mean']:.3f}", "sub": f"± {out['cv_rmse_std']:.3f} across folds", "icon": "↻"},
-            {"label": "Validation RMSE", "value": f"{out['val']['rmse']:.3f}", "sub": f"MAE {out['val']['mae']:.3f} · R² {out['val']['r2']:.3f}", "icon": "V"},
-            {"label": "Test RMSE", "value": f"{out['test']['rmse']:.3f}", "sub": f"MAE {out['test']['mae']:.3f} · R² {out['test']['r2']:.3f} · adj {out['test'].get('adj_r2', float('nan')):.3f}", "icon": "◎",
-             "accent": "linear-gradient(90deg,#4FE3C1,#7C9CFF)"},
+            {"label": "Train RMSE", "value": f"{out['train']['rmse']:.3f}", "sub": f"R² {out['train']['r2']:.3f}"},
+            {"label": "CV RMSE", "value": f"{out['cv_rmse_mean']:.3f}", "sub": f"± {out['cv_rmse_std']:.3f} across folds"},
+            {"label": "Validation RMSE", "value": f"{out['val']['rmse']:.3f}", "sub": f"MAE {out['val']['mae']:.3f} · R² {out['val']['r2']:.3f}"},
+            {"label": "Test RMSE", "value": f"{out['test']['rmse']:.3f}", "sub": f"MAE {out['test']['mae']:.3f} · R² {out['test']['r2']:.3f} · adj {out['test'].get('adj_r2', float('nan')):.3f}"},
         ])
         gap = out["val"]["rmse"] - out["train"]["rmse"]
         if gap > 0.15:

@@ -4,7 +4,7 @@ from src import ui
 from src.config import DEFINITIONS, LABELS
 from src.data_acquisition import SOURCES
 
-ui.page_header("About the Project", "Purpose, data, methods, design decisions and limitations of the World Happiness AI Lab.", "Project")
+ui.page_header("About the project", "Purpose, data, methods, design decisions and limitations of the World Happiness AI Lab.", "Project")
 
 ui.section("Purpose", "01")
 st.markdown(

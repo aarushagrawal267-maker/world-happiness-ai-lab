@@ -9,7 +9,7 @@ from src.explainability import explain_instance
 from src.prediction import extreme_warning, input_specs, mahalanobis_extrapolation, nearest_profiles, predict_one, validate_inputs
 
 ui.page_header(
-    "Happiness Prediction",
+    "Happiness prediction",
     "Enter a country profile and the model estimates the national average life evaluation typical of historical country-years with similar indicators — "
     "with a calibrated 90% prediction interval and an explanation.",
     "Simulate · Predict",
@@ -23,8 +23,8 @@ lead = [k for k in ("production_best", "production_best_affect") if k in reg]
 choices = lead + sorted(k for k, v in reg.items() if k.startswith(("production_", "custom_")) and k not in lead and not k.endswith("_difficulty"))
 c1, c2 = st.columns([1.2, 2])
 with c1:
-    mname = st.selectbox("Model", choices, format_func=lambda n: f"★ {reg[n]['model_name']} — 6 core indicators (recommended)" if n == "production_best"
-                         else (f"★ {reg[n]['model_name']} — 8 inputs (better for crisis profiles)" if n == "production_best_affect" else f"{reg[n]['model_name']} · {n}"))
+    mname = st.selectbox("Model", choices, format_func=lambda n: f"{reg[n]['model_name']} — 6 core indicators (recommended)" if n == "production_best"
+                         else (f"{reg[n]['model_name']} — 8 inputs (better for crisis profiles)" if n == "production_best_affect" else f"{reg[n]['model_name']} · {n}"))
 meta = reg[mname]
 pipe = ui.model(mname)
 feats = meta["features"]
@@ -99,7 +99,7 @@ if go_btn or st.session_state.get("pred_last"):
     with c1:
         ui.chart(viz.gauge(out["prediction"], out.get("lower"), out.get("upper"), "Estimated Life Ladder (0–10)"), key="gauge")
         if "lower" in out:
-            st.markdown(f"<div style='text-align:center;margin-top:-10px'><span class='tag blue'>90% prediction interval: {out['lower']:.2f} – {out['upper']:.2f}</span></div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='text-align:center;margin-top:-8px;font-family:var(--mono);font-size:.8125rem;color:var(--text-2)'>90% prediction interval {out['lower']:.2f} – {out['upper']:.2f}<span class='scale' style='font-size:1em'>/ 10</span></div>", unsafe_allow_html=True)
             if adaptive:
                 st.caption(f"Adaptive conformal interval: ±{out['interval_halfwidth']:.2f} for this profile (range across countries "
                            f"±{adaptive['min_halfwidth']:.2f} to ±{adaptive['max_halfwidth']:.2f}). It widens where the model has historically erred more. "
@@ -109,8 +109,8 @@ if go_btn or st.session_state.get("pred_last"):
         else:
             st.caption("Calibrated intervals are computed for the best production model only.")
     with c2:
-        ui.stat_row([("Model", meta["model_name"]), ("Point estimate", f"{out['prediction']:.3f}"),
-                     ("Profile typicality", f"{maha['percentile']:.0f}th pct"), ("Global mean", f"{panel[TARGET].mean():.2f}")])
+        ui.stat_row([("Model", meta["model_name"]), ("Point estimate", ui.score(out['prediction'], ".3f")),
+                     ("Profile typicality", f"{maha['percentile']:.0f}th pct"), ("Global mean", ui.score(panel[TARGET].mean()))])
         ew = extreme_warning(out["prediction"], adaptive)
         if ew:
             ui.callout(ew, "warn", "⇅")

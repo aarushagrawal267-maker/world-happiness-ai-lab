@@ -1,13 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="300" height="64" viewBox="0 0 300 64">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#7C9CFF"/><stop offset="0.5" stop-color="#4FE3C1"/><stop offset="1" stop-color="#B18CFF"/>
-    </linearGradient>
-  </defs>
-  <rect x="4" y="8" width="48" height="48" rx="14" fill="url(#g)"/>
-  <rect x="8" y="12" width="40" height="40" rx="11" fill="#0A1026"/>
-  <circle cx="28" cy="32" r="12" fill="none" stroke="url(#g)" stroke-width="3"/>
-  <path d="M28 20 A12 12 0 0 1 28 44 Z" fill="url(#g)"/>
-  <text x="64" y="29" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="17" font-weight="700" fill="#E8ECFF" letter-spacing="1">WORLD HAPPINESS</text>
-  <text x="64" y="50" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13" font-weight="600" fill="#8E98C8" letter-spacing="3">AI LAB</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="64" viewBox="0 0 300 64" fill="none">
+  <circle cx="28" cy="32" r="18" stroke="#6da7ec" stroke-width="2.5"/>
+  <path d="M14 24h28M10.5 32h35M14 40h28" stroke="#6da7ec" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="58" y="30" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#ededed">World Happiness</text>
+  <text x="58" y="49" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="13" font-weight="400" fill="#85858b">AI Lab</text>
 </svg>

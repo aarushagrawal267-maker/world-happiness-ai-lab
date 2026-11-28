@@ -8,7 +8,7 @@ from src.evaluate import METRIC_INFO, error_by_group, error_by_score_range, regr
 from src.regression_models import MODEL_SPECS
 
 ui.page_header(
-    "Model Evaluation",
+    "Model evaluation",
     "Diagnostics on held-out test data: accuracy metrics, actual vs predicted, residual behaviour, and where the model errs — by region and by score range.",
     "Machine learning · Evaluate",
 )
@@ -27,13 +27,13 @@ r["residual"] = r["actual"] - r["predicted"]
 r["abs_error"] = r["residual"].abs()
 m = regression_metrics(r["actual"], r["predicted"], len(res["features"]))
 ui.kpi_cards([
-    {"label": "R²", "value": f"{m['r2']:.3f}", "icon": "◔"},
-    {"label": "Adjusted R²", "value": f"{m['adj_r2']:.3f}", "sub": f"p = {len(res['features'])} features", "icon": "◑"},
-    {"label": "MAE", "value": f"{m['mae']:.3f}", "sub": "ladder points", "icon": "|e|"},
-    {"label": "MSE", "value": f"{m['mse']:.3f}", "icon": "e²"},
-    {"label": "RMSE", "value": f"{m['rmse']:.3f}", "sub": "ladder points", "icon": "√", "accent": "linear-gradient(90deg,#4FE3C1,#7C9CFF)"},
-    {"label": "Bias", "value": f"{m['bias']:+.3f}", "sub": "mean(pred − actual)", "icon": "±"},
-    {"label": "Max error", "value": f"{m['max_error']:.2f}", "sub": f"n = {m['n']} test rows", "icon": "⇕"},
+    {"label": "R²", "value": f"{m['r2']:.3f}"},
+    {"label": "Adjusted R²", "value": f"{m['adj_r2']:.3f}", "sub": f"p = {len(res['features'])} features"},
+    {"label": "MAE", "value": f"{m['mae']:.3f}", "sub": "ladder points"},
+    {"label": "MSE", "value": f"{m['mse']:.3f}"},
+    {"label": "RMSE", "value": f"{m['rmse']:.3f}", "sub": "ladder points"},
+    {"label": "Bias", "value": f"{m['bias']:+.3f}", "sub": "mean(pred − actual)"},
+    {"label": "Max error", "value": f"{m['max_error']:.2f}", "sub": f"n = {m['n']} test rows"},
 ])
 
 c1, c2 = st.columns(2)
@@ -65,11 +65,10 @@ if s == "group" and k == res["best_model"]["key"]:
     cf = res["conformal"]
     ui.section("Prediction-interval calibration", "", cf["method"])
     ui.kpi_cards([
-        {"label": "Target coverage", "value": f"{cf['coverage_target']:.0%}", "icon": "◎"},
-        {"label": "Interval half-width", "value": f"±{cf['q_split']:.2f}", "sub": f"calibrated on {cf['n_calibration']} validation rows", "icon": "↔"},
-        {"label": "Empirical test coverage", "value": f"{cf['empirical_test_coverage_split']:.1%}", "sub": f"{cf['n_test']} rows of unseen countries", "icon": "✓",
-         "accent": "linear-gradient(90deg,#4FE3C1,#9BE57A)"},
-        {"label": "Production half-width", "value": f"±{cf['q_cv']:.2f}", "sub": f"grouped 5-fold OOF, coverage {cf['empirical_oof_coverage_cv']:.1%}", "icon": "⟷"},
+        {"label": "Target coverage", "value": f"{cf['coverage_target']:.0%}"},
+        {"label": "Interval half-width", "value": f"±{cf['q_split']:.2f}", "sub": f"calibrated on {cf['n_calibration']} validation rows"},
+        {"label": "Empirical test coverage", "value": f"{cf['empirical_test_coverage_split']:.1%}", "sub": f"{cf['n_test']} rows of unseen countries"},
+        {"label": "Production half-width", "value": f"±{cf['q_cv']:.2f}", "sub": f"grouped 5-fold OOF, coverage {cf['empirical_oof_coverage_cv']:.1%}"},
     ])
     st.caption("Split-conformal intervals: the 90th percentile (finite-sample corrected) of absolute errors on data from countries the model never saw. "
                "They guarantee average coverage under exchangeability, not coverage for every individual country.")

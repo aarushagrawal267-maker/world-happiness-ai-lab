@@ -7,7 +7,7 @@ from src.config import INDICATORS, LABELS, REGIONS, SHORT_LABELS, TARGET
 from src.geography import load_country_reference
 
 ui.page_header(
-    "Global Happiness Explorer",
+    "Global happiness explorer",
     "Explore every indicator on an interactive world map. Hover for statistics, click countries to inspect and compare them, "
     "filter by region, and see exactly which countries have no data.",
     "Explore · Interactive world map",
@@ -67,7 +67,7 @@ missing = sorted(set(universe["country"]) - have)
 ui.stat_row([
     ("Countries with data", f"{len(have)}"),
     ("No data for this view", f"{len(missing)}"),
-    ("Mean", f"{d[col].mean():.3f}" if col not in ("cluster_name",) else "—"),
+    ("Mean", (ui.score(d[col].mean(), ".3f") if col in ("ladder_score", "life_ladder") else f"{d[col].mean():.3f}") if col not in ("cluster_name",) else "—"),
     ("Min → max", f"{d[col].min():.2f} → {d[col].max():.2f}" if col not in ("cluster_name",) else f"{d[col].nunique()} clusters"),
     ("Source", f"<span style='font-size:.8rem'>{src_txt}</span>"),
 ])
@@ -111,7 +111,7 @@ if clicked and tuple(clicked) != st.session_state.get("explorer_last_click"):
 sel = st.multiselect("Selected countries (click the map or choose here)", all_countries, max_selections=6, key="explorer_ms")
 
 if sel:
-    ui.section("Country details", "◉", "latest available observations — missing values are shown as n/a, never estimated")
+    ui.section("Country details", "", "latest available observations — missing values are shown as n/a, never estimated")
     cols = st.columns(min(len(sel), 3))
     for i, c in enumerate(sel):
         with cols[i % len(cols)]:
@@ -125,10 +125,10 @@ if sel:
                     v = last_p[f]
                     rows.append(f"<tr><td style='color:var(--muted);padding:2px 10px 2px 0'>{SHORT_LABELS[f]}</td><td style='text-align:right;color:var(--text)'>{'n/a' if pd.isna(v) else f'{v:.3f}'}</td></tr>")
             region = (last_r["region"] if last_r is not None else last_p["region"]) if (last_r is not None or last_p is not None) else "—"
-            head = (f"<div class='big-number' style='font-size:2.6rem'>{last_r['ladder_score']:.2f}</div><div style='color:var(--muted);font-size:.8rem'>Rank {int(last_r['rank'])} · WHR {int(last_r['year']) + 1}</div>"
+            head = (f"<div class='big-number' style='font-size:2.5rem'>{ui.score(last_r['ladder_score'])}</div><div style='color:var(--muted);font-size:.8rem'>Rank {int(last_r['rank'])} · WHR {int(last_r['year']) + 1}</div>"
                     if last_r is not None else "<div style='color:var(--muted)'>Not in official rankings</div>")
             st.markdown(
-                f"<div class='card glow'><div style='display:flex;justify-content:space-between;align-items:flex-start'><div><h4>{ui.esc(c)}</h4>"
+                f"<div class='card'><div style='display:flex;justify-content:space-between;align-items:flex-start'><div><h4>{ui.esc(c)}</h4>"
                 f"<div style='font-size:.78rem;color:var(--muted)'>{ui.esc(region)}</div></div><div style='text-align:right'>{head}</div></div>"
                 f"<div style='margin-top:10px;font-size:.78rem;color:var(--muted)'>Annual panel {int(last_p['year']) if last_p is not None else ''} · Life Ladder "
                 f"{'n/a' if last_p is None else f'{last_p[TARGET]:.2f}'}</div><table style='width:100%;font-size:.84rem;margin-top:6px'>{''.join(rows)}</table></div>",
@@ -138,7 +138,7 @@ if sel:
                 ui.chart(viz.sparkline(r_hist["ladder_score"].tolist(), height=70), key=f"spark_{c}")
                 st.caption(f"Official ladder score {int(r_hist['year'].min())}–{int(r_hist['year'].max())}")
     if len(sel) >= 2:
-        ui.section("Quick comparison", "⇄")
+        ui.section("Quick comparison")
         y_cmp = int(rk["year"].max())
         cmp = rk[(rk["country"].isin(sel)) & (rk["year"] == y_cmp)][["country", "rank", "ladder_score", "lower_whisker", "upper_whisker", "region"]]
         not_ranked = sorted(set(sel) - set(cmp["country"]))
