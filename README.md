@@ -11,7 +11,7 @@ intervals, a what-if scenario simulator and an automated insights engine — all
 > **association** in observational country-level data; none is presented as a cause.
 
 ## Quick start
-Needs **Python 3.12 or 3.13** (64-bit). Python 3.11 will not work: the pinned numpy/SciPy/XGBoost/SHAP versions need 3.12+.
+Needs **Python 3.12 or newer** (64-bit; CI tests 3.12 and 3.13). Python 3.11 will not work: the pinned numpy/SciPy/XGBoost/SHAP versions need 3.12+.
 ```bash
 git clone https://github.com/aarushagrawal267-maker/world-happiness-ai-lab.git
 cd world-happiness-ai-lab
@@ -24,15 +24,35 @@ python -m pytest -q                # optional: run the 109 automated tests
 Datasets and trained models are already included, so the app works offline straight after installation.
 
 ## Screenshots
-| Home dashboard | Global happiness explorer |
-|---|---|
-| ![Home](docs/screenshots/01_home.png) | ![World map](docs/screenshots/02_Global_Happiness_Explorer.png) |
-| **Happiness prediction** | **What-if simulator** |
-| ![Prediction](docs/screenshots/11_Happiness_Prediction.png) | ![What-if](docs/screenshots/12_What_If_Simulator.png) |
-| **Model comparison** | **Explainable AI** |
-| ![Models](docs/screenshots/08_Model_Comparison.png) | ![XAI](docs/screenshots/10_Explainable_AI.png) |
+All 15 pages of the app, in navigation order. Click a thumbnail to open the full-size screenshot.
 
-More screenshots of every page are in [`docs/screenshots/`](docs/screenshots/).
+<table>
+  <tr>
+    <td align="center" valign="top" width="33%"><b>Home dashboard</b><br><a href="docs/screenshots/01_home.png"><img src="docs/screenshots/01_home.png" alt="Home dashboard" width="280"></a></td>
+    <td align="center" valign="top" width="33%"><b>Global happiness explorer</b><br><a href="docs/screenshots/02_Global_Happiness_Explorer.png"><img src="docs/screenshots/02_Global_Happiness_Explorer.png" alt="Global happiness explorer" width="280"></a></td>
+    <td align="center" valign="top" width="33%"><b>Exploratory analysis</b><br><a href="docs/screenshots/03_Exploratory_Analysis.png"><img src="docs/screenshots/03_Exploratory_Analysis.png" alt="Exploratory analysis" width="280"></a></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top" width="33%"><b>Statistical analysis</b><br><a href="docs/screenshots/04_Statistical_Analysis.png"><img src="docs/screenshots/04_Statistical_Analysis.png" alt="Statistical analysis" width="280"></a></td>
+    <td align="center" valign="top" width="33%"><b>Country comparison</b><br><a href="docs/screenshots/05_Country_Comparison.png"><img src="docs/screenshots/05_Country_Comparison.png" alt="Country comparison" width="280"></a></td>
+    <td align="center" valign="top" width="33%"><b>Historical trends</b><br><a href="docs/screenshots/06_Historical_Trends.png"><img src="docs/screenshots/06_Historical_Trends.png" alt="Historical trends" width="280"></a></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top" width="33%"><b>Country clustering</b><br><a href="docs/screenshots/07_Country_Clustering.png"><img src="docs/screenshots/07_Country_Clustering.png" alt="Country clustering" width="280"></a></td>
+    <td align="center" valign="top" width="33%"><b>Model comparison</b><br><a href="docs/screenshots/08_Model_Comparison.png"><img src="docs/screenshots/08_Model_Comparison.png" alt="Model comparison" width="280"></a></td>
+    <td align="center" valign="top" width="33%"><b>Model evaluation</b><br><a href="docs/screenshots/09_Model_Evaluation.png"><img src="docs/screenshots/09_Model_Evaluation.png" alt="Model evaluation" width="280"></a></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top" width="33%"><b>Explainable AI</b><br><a href="docs/screenshots/10_Explainable_AI.png"><img src="docs/screenshots/10_Explainable_AI.png" alt="Explainable AI" width="280"></a></td>
+    <td align="center" valign="top" width="33%"><b>Happiness prediction</b><br><a href="docs/screenshots/11_Happiness_Prediction.png"><img src="docs/screenshots/11_Happiness_Prediction.png" alt="Happiness prediction" width="280"></a></td>
+    <td align="center" valign="top" width="33%"><b>What-if simulator</b><br><a href="docs/screenshots/12_What_If_Simulator.png"><img src="docs/screenshots/12_What_If_Simulator.png" alt="What-if simulator" width="280"></a></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top" width="33%"><b>Automated insights</b><br><a href="docs/screenshots/13_Automated_Insights.png"><img src="docs/screenshots/13_Automated_Insights.png" alt="Automated insights" width="280"></a></td>
+    <td align="center" valign="top" width="33%"><b>Dataset explorer</b><br><a href="docs/screenshots/14_Dataset_Explorer.png"><img src="docs/screenshots/14_Dataset_Explorer.png" alt="Dataset explorer" width="280"></a></td>
+    <td align="center" valign="top" width="33%"><b>ML training lab</b><br><a href="docs/screenshots/15_Machine_Learning_Training.png"><img src="docs/screenshots/15_Machine_Learning_Training.png" alt="ML training lab" width="280"></a></td>
+  </tr>
+</table>
 
 ---
 
