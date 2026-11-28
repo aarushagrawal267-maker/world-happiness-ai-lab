@@ -75,7 +75,7 @@ with tab_val:
         {"label": "Detected structure", "value": rep.kind.replace("_", " "), "sub": DATASET_KINDS.get(rep.kind, "")},
         {"label": "Rows · columns", "value": f"{rep.n_rows} · {rep.n_columns}"},
         {"label": "Countries", "value": str(rep.n_countries)},
-        {"label": "Duplicate keys", "value": str(rep.duplicate_country_year)},
+        {"label": "Duplicate keys", "value": str(rep.duplicate_country_year), "tone": "positive" if rep.duplicate_country_year == 0 else "negative"},
     ])
     for i in rep.issues:
         ui.callout(f"<b>{i.check}</b> — {i.message}", {"error": "danger", "warning": "warn", "info": "ok"}[i.level])

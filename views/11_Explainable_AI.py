@@ -97,7 +97,7 @@ with t4:
     ui.kpi_cards([
         {"label": "Actual Life Ladder", "value": ui.score(actual), "sub": f"{country} {year}"},
         {"label": "Predicted", "value": ui.score(ex['prediction']), "sub": MODEL_SPECS[k].name},
-        {"label": "Prediction error", "value": f"{err:+.2f}", "sub": "actual − predicted"},
+        {"label": "Prediction error", "value": f"{err:+.2f}", "sub": "actual − predicted", "tone": "positive" if abs(err) < 0.5 else "negative"},
         {"label": "Country seen in training?", "value": "yes" if in_train else "no", "sub": "errors are optimistic if yes" if in_train else "honest out-of-sample error"},
     ])
     c1, c2 = st.columns([1.3, 1])

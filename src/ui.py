@@ -25,7 +25,7 @@ _CSS = """
   --border: rgba(237,237,237,0.08); --border-strong: rgba(237,237,237,0.14);
   --text: #ededed; --text-2: #a1a1a6; --muted: #85858b;
   --primary: #6da7ec; --primary-ink: #0f0f10;
-  --positive: #4cc38a; --negative: #e5484d; --caution: #d4a24c;
+  --positive: #4cc38a; --negative: #e5484d; --negative-ink: #ec6a6f; --caution: #d4a24c;
   --radius: 12px; --radius-sm: 8px;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --font: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -78,6 +78,8 @@ section[data-testid="stSidebar"] [data-testid="stNavSectionHeader"] { font-famil
 .kpi { padding: 20px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); }
 .kpi .label { font-size: .8125rem; color: var(--text-2); }
 .kpi .value { font-size: 1.75rem; font-weight: 500; color: var(--text); line-height: 1.15; margin-top: 8px; font-variant-numeric: tabular-nums; }
+.kpi .value.positive { color: var(--positive); }
+.kpi .value.negative { color: var(--negative-ink); }
 .kpi .value.long { font-size: 1.25rem; padding-top: 8px; }
 .kpi .value small { font-family: var(--mono); font-size: .8125rem; color: var(--muted); font-weight: 400; margin-left: 4px; }
 .kpi .sub { font-size: .8125rem; color: var(--muted); margin-top: 4px; }
@@ -225,12 +227,13 @@ def score(v: float, fmt: str = ".2f") -> str:
 
 
 def kpi_cards(items: list[dict]) -> None:
-    """items: {label, value, sub?}. Legacy ``icon``/``accent`` keys are ignored: KPIs stay neutral."""
+    """items: {label, value, sub?, tone?}. ``tone`` ("positive"/"negative") colours the value only, for
+    figures that encode a state; the card stays neutral. Legacy ``icon``/``accent`` keys are ignored."""
     cells = []
     for it in items:
         cells.append(
             f"""<div class="kpi"><div class="label">{esc(it['label'])}</div>
-            <div class="value{' long' if len(str(it['value'])) > 7 and '<' not in str(it['value']) else ''}">{it['value']}</div><div class="sub">{it.get('sub', '')}</div></div>"""
+            <div class="value{' ' + it['tone'] if it.get('tone') in ('positive', 'negative') else ''}{' long' if len(str(it['value'])) > 7 and '<' not in str(it['value']) else ''}">{it['value']}</div><div class="sub">{it.get('sub', '')}</div></div>"""
         )
     st.markdown(f"<div class='kpi-grid'>{''.join(cells)}</div>", unsafe_allow_html=True)
 

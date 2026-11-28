@@ -121,7 +121,7 @@ with c2:
     ui.kpi_cards([
         {"label": "Original prediction", "value": ui.score(sc.base_prediction), "sub": base_label},
         {"label": "Scenario prediction", "value": ui.score(sc.modified_prediction), "sub": "modified inputs"},
-        {"label": "Difference", "value": f"{(0.0 if abs(sc.delta) < 0.005 else sc.delta):+.2f}", "sub": "ladder points"},
+        {"label": "Difference", "value": f"{(0.0 if abs(sc.delta) < 0.005 else sc.delta):+.2f}", "sub": "ladder points", "tone": "positive" if sc.delta >= 0 else "negative"},
     ])
     rmse = res["best_model"]["test"]["rmse"]
     if abs(sc.delta) < 0.1:
